@@ -1,0 +1,204 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//// ─────────────────────────────────────────────
+//// Organization & Auth
+//// ─────────────────────────────────────────────
+
+model Organization {
+  id        String       @id @default(cuid())
+  name      String
+
+  users     User[]
+  employees Employee[]
+  holidays  Holiday[]
+  otRules   OTRuleProfile[]
+  periods   PayrollPeriod[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id      String   @id                // StackAuth user id
+  email   String   @unique
+  name    String?
+  orgId   String
+  org     Organization @relation(fields: [orgId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//// ─────────────────────────────────────────────
+//// Employees (not login users)
+//// ─────────────────────────────────────────────
+
+enum SalaryType {
+  MONTHLY
+  DAILY
+}
+
+model Employee {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id])
+
+  name      String
+  department String?
+  position   String?
+
+  faceImage     String?
+  faceEmbedding Json?             // vector embedding JSON
+
+  salaryType SalaryType
+  baseSalary Decimal @db.Decimal(12,2)
+  otEligible Boolean @default(true)
+  ssfEnabled Boolean @default(true)
+
+  attendances AttendanceDay[]
+  payrollItems PayrollItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orgId])
+}
+
+//// ─────────────────────────────────────────────
+//// Attendance (daily summary)
+//// ─────────────────────────────────────────────
+
+model AttendanceDay {
+  id         String   @id @default(cuid())
+  orgId      String
+  org        Organization @relation(fields: [orgId], references: [id])
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  date        DateTime
+  checkIn     DateTime?
+  checkOut    DateTime?
+
+  // auto compute
+  workMinutes     Int @default(0)
+  otMinutes       Int @default(0)
+  lateMinutes     Int @default(0)
+
+  otWeekdayMinutes Int @default(0)
+  otWeekendMinutes Int @default(0)
+  otHolidayMinutes Int @default(0)
+
+  // lunch / break config
+  lunchDeductedMinutes Int @default(60)
+  allowLunchAsOT       Boolean @default(false)
+
+  // manual override options
+  manualWorkMinutes   Int?
+  manualOTMinutes     Int?
+  manualLateMinutes   Int?
+  manualNotes         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([employeeId, date])
+  @@index([orgId, date])
+}
+
+//// ─────────────────────────────────────────────
+//// Holiday (per org)
+//// ─────────────────────────────────────────────
+
+model Holiday {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id])
+
+  date      DateTime
+  title     String
+
+  createdAt DateTime @default(now())
+}
+
+//// ─────────────────────────────────────────────
+//// OT Rule Profile (JSON-based engine config)
+//// ─────────────────────────────────────────────
+
+enum OTPeriodMode {
+  PAY_PERIOD // default: align with payroll period
+  ROLLING_7_DAYS // every 7 days from period start
+  ISO_WEEK // Monday-Sunday
+}
+
+model OTRuleProfile {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id])
+
+  name      String
+  rules     Json                                // flexible config
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//// ─────────────────────────────────────────────
+//// Payroll
+//// ─────────────────────────────────────────────
+
+model PayrollPeriod {
+  id        String    @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id])
+
+  startDate DateTime
+  endDate   DateTime
+  status    String    @default("DRAFT")         // DRAFT | FINAL
+  otMode    OTPeriodMode @default(ROLLING_7_DAYS)
+
+  payrollItems PayrollItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orgId, startDate, endDate])
+}
+
+model PayrollItem {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id])
+
+  periodId  String
+  period    PayrollPeriod @relation(fields: [periodId], references: [id])
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  workDays     Int      @default(0)
+  lateMinutes  Int      @default(0)
+
+  basePay      Decimal  @db.Decimal(12,2)
+  otPay        Decimal  @db.Decimal(12,2) @default(0)
+  adjustment   Decimal  @db.Decimal(12,2) @default(0)
+
+  lateDeduction Decimal  @db.Decimal(12,2) @default(0)
+  ssfDeduction  Decimal  @db.Decimal(12,2) @default(0)
+
+  netPay        Decimal @db.Decimal(12,2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([periodId])
+  @@index([employeeId])
+}
