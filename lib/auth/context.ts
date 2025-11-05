@@ -1,6 +1,5 @@
-// lib/auth/context.ts
 import { headers } from "next/headers"
-import { prisma } from "../db/prisma"
+import { prisma } from "@/lib/db/prisma"
 
 export async function getAuthContext() {
   const h = await headers()
@@ -8,18 +7,17 @@ export async function getAuthContext() {
 
   if (!userId) return null
 
-  // fetch org (MVP: one org per user)
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, orgId: true, name: true },
+    select: { id: true, orgId: true, role: true },
   })
 
-  if (!user || !user.orgId) return null
+  if (!user?.orgId) return null
 
   return {
     userId: user.id,
     orgId: user.orgId,
-    name: user.name,
+    role: user.role,
   }
 }
 
