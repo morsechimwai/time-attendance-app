@@ -38,17 +38,19 @@ export default function SiteHeader() {
       <div className="flex w-full items-center gap-1 lg:gap-2">
         <SidebarTrigger />
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
-        <h1 className="text-base font-medium capitalize font-sans">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbPage>{currentPath}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </h1>
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline">Feedback</Button>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbPage className="font-medium capitalize font-sans">
+                {currentPath}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="ml-auto flex items-center gap-2 font-sans">
+          <Button size="sm" variant="outline">
+            Feedback
+          </Button>
         </div>
       </div>
     </header>

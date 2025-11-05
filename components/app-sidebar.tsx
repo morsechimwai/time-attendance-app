@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation"
 // Navigation
 
 // Icons
-import { Banknote, Clock, LayoutDashboard, LucideIcon, ScanFace, Users } from "lucide-react"
+import { Banknote, Clock, Flower, LayoutDashboard, LucideIcon, ScanFace, Users } from "lucide-react"
 
 // Components
 import {
@@ -101,7 +101,7 @@ export default function AppSidebar() {
       <SidebarHeader className="h-12 border-b">
         <SidebarMenuButton variant="default" asChild>
           <Link className="flex items-center h-full px-4" href="#" onClick={handleNavigate}>
-            <ScanFace className="bg-amber-400 rounded-lg" />
+            <Flower className="size-6 text-primary rotate-45" />
             <span className="text-xl font-black font-sans">FaceShift</span>
           </Link>
         </SidebarMenuButton>
@@ -110,7 +110,9 @@ export default function AppSidebar() {
         <SidebarGroup>
           {navigationGroups.map((group) => (
             <div key={group.label}>
-              <SidebarGroupLabel className="uppercase">{group.label}</SidebarGroupLabel>
+              <SidebarGroupLabel className="uppercase font-sans font-bold">
+                {group.label}
+              </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <div className="space-y-1">
@@ -125,7 +127,9 @@ export default function AppSidebar() {
                           >
                             <Link href={item.href} onClick={handleNavigate}>
                               <item.icon />
-                              <span className="capitalize">{item.label}</span>
+                              <span className="capitalize font-sans font-semibold">
+                                {item.label}
+                              </span>
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
