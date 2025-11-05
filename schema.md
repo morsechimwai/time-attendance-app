@@ -32,6 +32,7 @@ Version: v1.0 (MVP ready)
 | `id` | String | StackAuth ID ของ user |
 | `orgId` | String | อ้างถึงองค์กรที่ user สังกัด |
 | `email` | String | ใช้ login / ติดต่อ |
+| `name` | String | ชื่อเต็มของ user |
 | `role` | String | บทบาท เช่น `"ADMIN"` |
 | `createdAt`, `updatedAt` | DateTime | เวลาสร้าง / อัปเดต |
 
