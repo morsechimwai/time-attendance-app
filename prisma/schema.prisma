@@ -7,63 +7,141 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//// ─────────────────────────────────────────────
-//// Organization & Auth
-//// ─────────────────────────────────────────────
-
 model Organization {
-  id        String       @id @default(cuid())
-  name      String
+  id           String   @id @default(cuid())
+  name         String
+  locale       String?   // เช่น "th-TH" หรือ "en-US"
+  timezone     String?   // เช่น "Asia/Bangkok"
+  otProfileId  String?
+  otProfile    OtProfile? @relation(fields: [otProfileId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  users     User[]
-  employees Employee[]
-  holidays  Holiday[]
-  otRules   OTRuleProfile[]
-  periods   PayrollPeriod[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  users        User[]
+  employees    Employee[]
+  holidays     Holiday[]
+  payrolls     PayrollPeriod[]
 }
 
 model User {
-  id      String   @id                // StackAuth user id
-  email   String   @unique
-  name    String?
-  orgId   String
-  org     Organization @relation(fields: [orgId], references: [id])
+  id        String   @id
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id])
+  email     String   @unique
+  role      String   @default("ADMIN")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-//// ─────────────────────────────────────────────
-//// Employees (not login users)
-//// ─────────────────────────────────────────────
+model Employee {
+  id            String   @id @default(cuid())
+  orgId         String
+  org           Organization @relation(fields: [orgId], references: [id])
+  code          String      // รหัสพนักงาน (ใช้ใน slip/ค้นหา)
+  name          String
+  position      String?
+  department    String?
+  salaryType    SalaryType  // MONTHLY|DAILY
+  baseSalary    Decimal     @db.Decimal(12,2)
+  otEligible    Boolean     @default(true)
+  ssfEligible   Boolean     @default(true) // Social Security Flag
+  active        Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  faces         FaceEmbedding[]
+  checkEvents   CheckEvent[]
+  attendance    AttendanceDay[]
+  payrollRows   PayrollRow[]
+
+  @@unique([orgId, code])
+  @@index([orgId, active])
+}
 
 enum SalaryType {
   MONTHLY
   DAILY
 }
 
-model Employee {
+model FaceEmbedding {
   id        String   @id @default(cuid())
   orgId     String
-  org       Organization @relation(fields: [orgId], references: [id])
+  employeeId String
+  employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  vector    Bytes    // Float32Array serialized
+  version   String   // "arcface_512_v1"
+  embeddingDim Int      @default(512) // <-- เพิ่มเพื่อรองรับ future model swap
+  createdAt DateTime @default(now())
 
-  name      String
-  department String?
-  position   String?
+  @@index([orgId, employeeId])
+}
 
-  faceImage     String?
-  faceEmbedding Json?             // vector embedding JSON
+model CheckEvent {
+  id         String   @id @default(cuid())
+  orgId      String
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  kind       CheckKind // IN|OUT
+  ts         DateTime  // timestamp in kiosk timezone
+  source     String?   // kioskId/ip
+  timezone   String?   // <-- เพิ่ม เช่น "Asia/Bangkok" หรือ "UTC+7"
+  liveness   Boolean   @default(false)
+  createdAt  DateTime  @default(now())
 
-  salaryType SalaryType
-  baseSalary Decimal @db.Decimal(12,2)
-  otEligible Boolean @default(true)
-  ssfEnabled Boolean @default(true)
+  @@index([orgId, ts])
+  @@index([orgId, employeeId, ts])
+}
 
-  attendances AttendanceDay[]
-  payrollItems PayrollItem[]
+enum CheckKind { IN, OUT }
+
+model AttendanceDay {
+  // สรุปต่อวัน/ต่อพนักงาน สำหรับ payroll ใช้ตัวนี้
+  id           String   @id @default(cuid())
+  orgId        String
+  employeeId   String
+  date         DateTime // 00:00 local
+  // ค่าที่ engine คำนวณ:
+  workMinutes  Int      @default(0)
+  lateMinutes  Int      @default(0)
+  otWeekday    Int      @default(0)
+  otWeekend    Int      @default(0)
+  otHoliday    Int      @default(0)
+  status       String   @default("OK") // OK|ABSENT|MANUAL
+  notes        String?
+
+  // audit:
+  computedAt   DateTime @default(now())
+  overrideBy   String?
+  overrideAt   DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@unique([orgId, employeeId, date]) // ensure one per day per employee
+  @@index([orgId, date])
+  @@index([orgId, date, status])
+}
+
+model Holiday {
+  id       String   @id @default(cuid())
+  orgId    String
+  date     DateTime // 00:00 local
+  kind     String   // "HOLIDAY" | custom labels
+  name     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orgId, date])
+  @@index([orgId, date])
+}
+
+model OtProfile {
+  id        String   @id @default(cuid())
+  orgId     String
+  name      String   @default("Default")
+  json      Json     // เก็บ config ตามสเปคใน requirement
+  otProfileSnapshot Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -71,134 +149,55 @@ model Employee {
   @@index([orgId])
 }
 
-//// ─────────────────────────────────────────────
-//// Attendance (daily summary)
-//// ─────────────────────────────────────────────
-
-model AttendanceDay {
-  id         String   @id @default(cuid())
-  orgId      String
-  org        Organization @relation(fields: [orgId], references: [id])
-
-  employeeId String
-  employee   Employee @relation(fields: [employeeId], references: [id])
-
-  date        DateTime
-  checkIn     DateTime?
-  checkOut    DateTime?
-
-  // auto compute
-  workMinutes     Int @default(0)
-  otMinutes       Int @default(0)
-  lateMinutes     Int @default(0)
-
-  otWeekdayMinutes Int @default(0)
-  otWeekendMinutes Int @default(0)
-  otHolidayMinutes Int @default(0)
-
-  // lunch / break config
-  lunchDeductedMinutes Int @default(60)
-  allowLunchAsOT       Boolean @default(false)
-
-  // manual override options
-  manualWorkMinutes   Int?
-  manualOTMinutes     Int?
-  manualLateMinutes   Int?
-  manualNotes         String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([employeeId, date])
-  @@index([orgId, date])
-}
-
-//// ─────────────────────────────────────────────
-//// Holiday (per org)
-//// ─────────────────────────────────────────────
-
-model Holiday {
-  id        String   @id @default(cuid())
-  orgId     String
-  org       Organization @relation(fields: [orgId], references: [id])
-
-  date      DateTime
-  title     String
-
-  createdAt DateTime @default(now())
-}
-
-//// ─────────────────────────────────────────────
-//// OT Rule Profile (JSON-based engine config)
-//// ─────────────────────────────────────────────
-
-enum OTPeriodMode {
-  PAY_PERIOD // default: align with payroll period
-  ROLLING_7_DAYS // every 7 days from period start
-  ISO_WEEK // Monday-Sunday
-}
-
-model OTRuleProfile {
-  id        String   @id @default(cuid())
-  orgId     String
-  org       Organization @relation(fields: [orgId], references: [id])
-
-  name      String
-  rules     Json                                // flexible config
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-//// ─────────────────────────────────────────────
-//// Payroll
-//// ─────────────────────────────────────────────
-
 model PayrollPeriod {
-  id        String    @id @default(cuid())
-  orgId     String
-  org       Organization @relation(fields: [orgId], references: [id])
+  id          String   @id @default(cuid())
+  orgId       String
+  title       String   // e.g., "งวด 1-15 พ.ย. 2025"
+  mode        PayrollMode // PAY_PERIOD | ROLLING_7_DAYS | ISO_WEEK
+  startDate   DateTime
+  endDate     DateTime   // exclusive
+  status      PayrollStatus @default(DRAFT)
 
-  startDate DateTime
-  endDate   DateTime
-  status    String    @default("DRAFT")         // DRAFT | FINAL
-  otMode    OTPeriodMode @default(ROLLING_7_DAYS)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  payrollItems PayrollItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  rows        PayrollRow[]
 
   @@index([orgId, startDate, endDate])
 }
 
-model PayrollItem {
-  id        String   @id @default(cuid())
-  orgId     String
-  org       Organization @relation(fields: [orgId], references: [id])
+enum PayrollStatus { DRAFT, FINAL }
+enum PayrollMode { PAY_PERIOD, ROLLING_7_DAYS, ISO_WEEK }
 
-  periodId  String
-  period    PayrollPeriod @relation(fields: [periodId], references: [id])
+model PayrollRow {
+  id            String   @id @default(cuid())
+  orgId         String
+  periodId      String
+  period        PayrollPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  employeeId    String
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
-  employeeId String
-  employee   Employee @relation(fields: [employeeId], references: [id])
+  // amounts (สรุปจาก AttendanceDay)
+  basePay       Decimal  @db.Decimal(12,2)
+  otPay         Decimal  @db.Decimal(12,2)
+  lateDeduction Decimal  @db.Decimal(12,2)
+  ssf           Decimal  @db.Decimal(12,2)
+  adjustments   Decimal  @db.Decimal(12,2) // manual +/-
+  adjustNote    String?  // optional, เหตุผลสั้นๆ
+  adjustBy      String?  // userId ของคนแก้ไข
+  netPay        Decimal  @db.Decimal(12,2)
 
-  workDays     Int      @default(0)
-  lateMinutes  Int      @default(0)
+  // raw counters (ช่วย debug/สลิป)
+  workMinutes   Int      @default(0)
+  otMinutes     Int      @default(0)
+  lateMinutes   Int      @default(0)
 
-  basePay      Decimal  @db.Decimal(12,2)
-  otPay        Decimal  @db.Decimal(12,2) @default(0)
-  adjustment   Decimal  @db.Decimal(12,2) @default(0)
+  data          Json?    // snapshot of rules, rates for audit
 
-  lateDeduction Decimal  @db.Decimal(12,2) @default(0)
-  ssfDeduction  Decimal  @db.Decimal(12,2) @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  netPay        Decimal @db.Decimal(12,2)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([orgId])
-  @@index([periodId])
-  @@index([employeeId])
+  @@unique([orgId, periodId, employeeId])
+  @@index([orgId, employeeId])
+  @@index([orgId, periodId])
 }
