@@ -87,6 +87,11 @@ model CheckEvent {
   source     String?   // kioskId/ip
   timezone   String?   // <-- เพิ่ม เช่น "Asia/Bangkok" หรือ "UTC+7"
   liveness   Boolean   @default(false)
+
+  latitude   Decimal?  @db.Decimal(9,6)
+  longitude  Decimal?  @db.Decimal(9,6)
+  accuracy   Decimal?  @db.Decimal(5,2) // optional, หน่วยเมตร
+
   createdAt  DateTime  @default(now())
 
   @@index([orgId, ts])

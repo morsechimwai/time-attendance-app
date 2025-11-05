@@ -18,7 +18,7 @@ Version: v1.0 (MVP ready)
 | `otProfile` | Relation → `OtProfile` | ความสัมพันธ์ไปยัง rule engine ของ OT |
 | `createdAt` / `updatedAt` | DateTime | บันทึกเวลาสร้าง/อัปเดต |
 
-**Relations:**  
+**Relations:**
 `users`, `employees`, `holidays`, `payrolls`
 
 ---
@@ -56,7 +56,7 @@ Version: v1.0 (MVP ready)
 | `active` | Boolean | สถานะการทำงาน |
 | `createdAt`, `updatedAt` | DateTime | Audit timestamps |
 
-**Relations:**  
+**Relations:**
 `faces`, `checkEvents`, `attendance`, `payrollRows`
 
 ---
@@ -93,6 +93,9 @@ Version: v1.0 (MVP ready)
 | `source` | String? | kiosk ID หรือ IP ที่มาของข้อมูล |
 | `timezone` | String? | โซนเวลาของ kiosk เช่น `"Asia/Bangkok"` |
 | `liveness` | Boolean | ผ่านการตรวจ liveness หรือไม่ |
+| `latitude` | Decimal(9,6)? | ละติจูด (องศา, optional) |
+| `longitude` | Decimal(9,6)? | ลองจิจูด (องศา, optional) |
+| `accuracy` | Decimal(5,2)? | ความแม่นยำ (เมตร, optional) |
 | `createdAt` | DateTime | เวลา insert log |
 
 **Index:** `(orgId, employeeId, ts)` เพื่อ query timeline ต่อพนักงานเร็วขึ้น
