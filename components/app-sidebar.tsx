@@ -114,7 +114,7 @@ export default function AppSidebar() {
       <SidebarHeader className="h-(--header-height) border-b">
         <SidebarMenuButton variant="default" asChild>
           <Link className="flex items-center h-full px-4" href="#" onClick={handleNavigate}>
-            <span className="text-xl font-black font-sans text-amber-600">Facin</span>
+            <span className="text-xl font-black font-sans text-amber-600">Face.In</span>
             <Focus className="text-amber-600 rotate-45" />
           </Link>
         </SidebarMenuButton>
