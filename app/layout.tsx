@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { StackProvider, StackTheme } from "@stackframe/stack"
 import { stackClientApp } from "../stack/client"
-import { Geist, Geist_Mono, Nunito } from "next/font/google"
+import { Geist, Geist_Mono, Inter } from "next/font/google"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -14,45 +14,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 
-const nunito = Nunito({
-  variable: "--font-nunito",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.faceshift.com"),
-  title: "FaceShift - Time and Attendance Management",
-  description: "Manage your time and attendance efficiently with FaceShift.",
-
-  keywords: [
-    "Time Tracking",
-    "Attendance Management",
-    "Employee Scheduling",
-    "Workforce Management",
-    "Time and Attendance Software",
-    "Employee Time Clock",
-    "Shift Management",
-    "Payroll Integration",
-    "Remote Work Tracking",
-    "FaceShift",
-  ],
-
-  openGraph: {
-    title: "FaceShift - Time and Attendance Management",
-    description: "Manage your time and attendance efficiently with FaceShift.",
-    url: "https://www.faceshift.com",
-    siteName: "FaceShift",
-    images: [
-      {
-        url: "https://www.faceshift.com/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "FaceShift Open Graph Image",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
+  metadataBase: new URL("https://face.in"),
+  title: {
+    default: "Time and Attendance Management",
+    template: "FaceIN | %s",
   },
+  description: "Manage your time and attendance efficiently with FaceIN.",
 }
 
 export default function RootLayout({
@@ -76,9 +49,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${nunito.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <StackProvider app={stackClientApp}>
           <StackTheme>{children}</StackTheme>
         </StackProvider>

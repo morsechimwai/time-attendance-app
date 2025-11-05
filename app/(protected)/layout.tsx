@@ -9,12 +9,12 @@ import AppSidebar from "@/components/app-sidebar"
 import SiteHeader from "@/components/site-header"
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://face.in"),
   title: {
     default: "Dashboard",
-    template: "%s | FaceShift",
+    template: "%s | FaceIN",
   },
-
-  description: "Dashboard - Manage your time and attendance efficiently with FaceShift.",
+  description: "Dashboard for managing time and attendance efficiently with FaceIN.",
 }
 
 export default function DashboardLayout({
