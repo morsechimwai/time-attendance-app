@@ -34,7 +34,7 @@ export default function SiteHeader() {
       : null
 
   return (
-    <header className="flex items-center border-b px-4 sticky top-0 z-10 bg-background h-12">
+    <header className="flex items-center border-b px-4 sticky top-0 z-10 bg-background h-(--header-height)">
       <div className="flex w-full items-center gap-1 lg:gap-2">
         <SidebarTrigger />
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />

@@ -10,7 +10,20 @@ import { usePathname } from "next/navigation"
 // Navigation
 
 // Icons
-import { Banknote, Clock, Flower, LayoutDashboard, LucideIcon, ScanFace, Users } from "lucide-react"
+import {
+  Banknote,
+  ChevronsDown,
+  ChevronsRight,
+  CircleDotDashed,
+  Clock,
+  Drama,
+  Flower,
+  Focus,
+  LayoutDashboard,
+  LucideIcon,
+  ScanFace,
+  Users,
+} from "lucide-react"
 
 // Components
 import {
@@ -98,11 +111,11 @@ export default function AppSidebar() {
 
   return (
     <Sidebar collapsible="offcanvas">
-      <SidebarHeader className="h-12 border-b">
+      <SidebarHeader className="h-(--header-height) border-b">
         <SidebarMenuButton variant="default" asChild>
           <Link className="flex items-center h-full px-4" href="#" onClick={handleNavigate}>
-            <Flower className="size-6 text-primary rotate-45" />
-            <span className="text-xl font-black font-sans">FaceShift</span>
+            <span className="text-xl font-black font-sans text-amber-600">Facin</span>
+            <Focus className="text-amber-600 rotate-45" />
           </Link>
         </SidebarMenuButton>
       </SidebarHeader>
