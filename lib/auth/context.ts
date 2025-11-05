@@ -1,24 +1,20 @@
+// lib/auth/context.ts
 import { headers } from "next/headers"
-import { prisma } from "@/lib/db/prisma"
+import { ensureUserExists } from "@/lib/services/user.service"
 
 export async function getAuthContext() {
   const h = await headers()
   const userId = h.get("x-user-id")
-
   if (!userId) return null
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true, orgId: true, role: true },
+  const user = await ensureUserExists({
+    userId,
+    email: h.get("x-user-email") ?? undefined,
+    name: h.get("x-user-name") ?? undefined,
+    orgId: h.get("x-user-org-id") ?? null,
   })
 
-  if (!user?.orgId) return null
-
-  return {
-    userId: user.id,
-    orgId: user.orgId,
-    role: user.role,
-  }
+  return { userId: user.id, orgId: user.orgId }
 }
 
 export async function requireAuth() {
