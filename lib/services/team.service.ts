@@ -1,9 +1,9 @@
-// lib/services/user.service.ts
+// lib/services/team.service.ts
 import { stackServerApp } from "@/stack/server"
 import { requireAuthContext } from "@/lib/auth/context"
 import { AppError } from "@/lib/errors/app-error"
 
-export async function getCurrentUser() {
+export async function getCurrentTeam() {
   const { userId } = await requireAuthContext()
 
   const user = await stackServerApp.getUser(userId).catch(() => null)
@@ -11,5 +11,10 @@ export async function getCurrentUser() {
     throw new AppError("FORBIDDEN", "User not found")
   }
 
-  return user
+  const team = user.selectedTeam
+  if (!team) {
+    throw new AppError("FORBIDDEN", "No team selected")
+  }
+
+  return team
 }
