@@ -7,8 +7,8 @@ export const stackServerApp = new StackServerApp({
   inheritsFrom: stackClientApp,
   urls: {
     signIn: "/signin",
-    signOut: "/signout",
-    afterSignIn: "/dashboard",
+    signUp: "/signup",
+    afterSignIn: "/",
     afterSignOut: "/",
   },
 })
