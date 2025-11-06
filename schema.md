@@ -1,217 +1,231 @@
-# 📘 Database Schema Documentation — Face Attendance & Payroll System
+# 📘 Database Schema — Time Attendance & Payroll
 
-Version: v1.0 (MVP ready)
+Version: v1.2 (schema synced with `prisma/schema.prisma`)
 
----
-
-## 🏢 **Organization**
-
-> เก็บข้อมูลของบริษัท / tenant แต่ละรายในระบบ (multi-tenant SaaS)
-
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String (CUID) | รหัสองค์กร (primary key) |
-| `name` | String | ชื่อองค์กร |
-| `locale` | String? | รูปแบบ locale เช่น `"th-TH"`, `"en-US"` |
-| `timezone` | String? | Time zone เช่น `"Asia/Bangkok"` ใช้คำนวณเวลา check-in/out |
-| `otProfileId` | String? | อ้างถึงโปรไฟล์ OT ปัจจุบันที่องค์กรใช้ |
-| `otProfile` | Relation → `OtProfile` | ความสัมพันธ์ไปยัง rule engine ของ OT |
-| `createdAt` / `updatedAt` | DateTime | บันทึกเวลาสร้าง/อัปเดต |
-
-**Relations:**
-`users`, `employees`, `holidays`, `payrolls`
+ระบบเป็น multi-tenant เชื่อมกับ StackAuth; ทุกตารางหลักมี `teamId` สำหรับแยกข้อมูลแต่ละองค์กร
 
 ---
 
-## 👤 **User**
+## 👨‍🏭 Employee
 
-> ผู้ใช้ระบบ (ตอน MVP มีแค่ Admin)
+> เก็บข้อมูลพนักงาน ใช้ร่วมทั้ง attendance และ payroll
 
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String | StackAuth ID ของ user |
-| `orgId` | String | อ้างถึงองค์กรที่ user สังกัด |
-| `email` | String | ใช้ login / ติดต่อ |
-| `name` | String | ชื่อเต็มของ user |
-| `role` | String | บทบาท เช่น `"ADMIN"` |
-| `createdAt`, `updatedAt` | DateTime | เวลาสร้าง / อัปเดต |
-
----
-
-## 👨‍🏭 **Employee**
-
-> ข้อมูลพนักงานแต่ละคน ใช้ใน Attendance และ Payroll
-
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String | รหัสพนักงานภายในระบบ |
-| `orgId` | String | องค์กรที่สังกัด |
-| `code` | String | รหัสพนักงาน (HR code) |
-| `name` | String | ชื่อพนักงาน |
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String (CUID) | Primary key |
+| `teamId` | String | StackAuth Team ID |
+| `code` | String | รหัสพนักงาน (unique per team) |
+| `name` | String | ชื่อ-นามสกุล |
 | `position` | String? | ตำแหน่ง |
 | `department` | String? | แผนก |
-| `salaryType` | Enum (`MONTHLY` / `DAILY`) | ประเภทเงินเดือน |
-| `baseSalary` | Decimal(12,2) | เงินเดือนหรือค่าจ้างพื้นฐาน |
-| `otEligible` | Boolean | มีสิทธิ์ OT หรือไม่ |
-| `ssfEligible` | Boolean | มีสิทธิ์ประกันสังคมหรือไม่ |
-| `active` | Boolean | สถานะการทำงาน |
-| `createdAt`, `updatedAt` | DateTime | Audit timestamps |
+| `salaryType` | `SalaryType` | `MONTHLY` \| `DAILY` |
+| `baseSalary` | Decimal(12,2) | ฐานเงินเดือน/ค่าแรง |
+| `otEligible` | Boolean | default `true` |
+| `ssfEligible` | Boolean | default `true` |
+| `status` | `EmployeeStatus` | default `ACTIVE` |
+| `active` | Boolean | default `true` (soft-active flag) |
+| `otProfileId` | String? | FK → `OtProfile.id` |
+| `otProfile` | Relation | OT rule ที่ผูกกับพนักงาน (nullable) |
+| `createdAt` | DateTime | default `now()` |
+| `updatedAt` | DateTime | auto update |
 
-**Relations:**
-`faces`, `checkEvents`, `attendance`, `payrollRows`
-
----
-
-## 🧠 **FaceEmbedding**
-
-> เก็บเวกเตอร์ใบหน้าที่ encode จากภาพเพื่อใช้ตรวจจับใน kiosk
-
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String | Primary key |
-| `orgId` | String | องค์กรเจ้าของข้อมูล |
-| `employeeId` | String | อ้างถึงพนักงาน |
-| `vector` | Bytes | ข้อมูลเวกเตอร์ (Float32Array serialized) |
-| `version` | String | เวอร์ชันของโมเดล เช่น `"arcface_512_v1"` |
-| `embeddingDim` | Int | ความยาวของ embedding (default 512) |
-| `createdAt` | DateTime | เวลาสร้าง record |
-
-**Cascade delete:** เมื่อพนักงานถูกลบ ข้อมูลใบหน้าจะถูกลบตาม
+**Relations:** `faces`, `checkEvents`, `attendance`, `payrollRows`  
+**Indexes:** `@@unique([teamId, code])`, `@@index([teamId, active])`
 
 ---
 
-## 📸 **CheckEvent**
+## 🧠 FaceEmbedding
 
-> เก็บข้อมูลการ Check-in / Check-out จาก kiosk (log ทุกครั้ง)
+> เก็บ Face vector ของพนักงานเพื่อทำ face recognition
 
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String | Primary key |
-| `orgId` | String | องค์กรที่สังกัด |
-| `employeeId` | String | อ้างถึงพนักงาน |
-| `kind` | Enum (`IN` / `OUT`) | ประเภทของ event |
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String (CUID) | Primary key |
+| `teamId` | String | Multi-tenant isolation |
+| `employeeId` | String | FK → `Employee.id` (cascade) |
+| `vector` | Bytes | Serialized embedding |
+| `version` | String | เวอร์ชันโมเดล เช่น `arcface_v1` |
+| `embeddingDim` | Int | default `512` |
+| `createdAt` | DateTime | default `now()` |
+
+**Indexes:** `@@index([teamId, employeeId])`
+
+---
+
+## 📸 CheckEvent
+
+> Log การ check-in/check-out ทุกครั้งจาก kiosk หรือ mobile
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String (CUID) | Primary key |
+| `teamId` | String | Multi-tenant isolation |
+| `employeeId` | String | FK → `Employee.id` (cascade) |
+| `kind` | `CheckKind` | `IN` \| `OUT` |
 | `ts` | DateTime | เวลาจริงของการสแกน |
-| `source` | String? | kiosk ID หรือ IP ที่มาของข้อมูล |
-| `timezone` | String? | โซนเวลาของ kiosk เช่น `"Asia/Bangkok"` |
-| `liveness` | Boolean | ผ่านการตรวจ liveness หรือไม่ |
-| `latitude` | Decimal(9,6)? | ละติจูด (องศา, optional) |
-| `longitude` | Decimal(9,6)? | ลองจิจูด (องศา, optional) |
-| `accuracy` | Decimal(5,2)? | ความแม่นยำ (เมตร, optional) |
-| `createdAt` | DateTime | เวลา insert log |
+| `source` | String? | เช่น kiosk ID |
+| `timezone` | String? | เช่น `Asia/Bangkok` |
+| `liveness` | Boolean | default `false` |
+| `latitude` | Decimal(9,6)? | Optional geo |
+| `longitude` | Decimal(9,6)? | Optional geo |
+| `accuracy` | Decimal(5,2)? | Optional geo accuracy (m) |
+| `createdAt` | DateTime | default `now()` |
 
-**Index:** `(orgId, employeeId, ts)` เพื่อ query timeline ต่อพนักงานเร็วขึ้น
+**Indexes:** `@@index([teamId, ts])`, `@@index([teamId, employeeId, ts])`
 
 ---
 
-## 📅 **AttendanceDay**
+## 📅 AttendanceDay
 
-> สรุปข้อมูลการทำงานของพนักงานต่อวัน (ใช้ในการคำนวณ Payroll)
+> สรุปผลการทำงานรายวัน (input สำคัญของ payroll)
 
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String | Primary key |
-| `orgId`, `employeeId` | String | องค์กร + พนักงาน |
-| `date` | Date | วันที่ (00:00 local time) |
-| `workMinutes` | Int | นาทีที่ทำงานจริงหลังหักพักกลางวัน |
-| `lateMinutes` | Int | นาทีที่มาสาย |
-| `otWeekday` / `otWeekend` / `otHoliday` | Int | นาที OT แยกตามประเภทวัน |
-| `status` | String | `"OK"` / `"ABSENT"` / `"MANUAL"` |
-| `notes` | String? | หมายเหตุเพิ่มเติม |
-| `computedAt` | DateTime | เวลา engine คำนวณล่าสุด |
-| `overrideBy` | String? | userId ที่แก้ไขด้วยมือ |
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String (CUID) | Primary key |
+| `teamId` | String | Multi-tenant isolation |
+| `employeeId` | String | FK → `Employee.id` (cascade) |
+| `date` | DateTime | วันที่ (เก็บ UTC) |
+| `workMinutes` | Int | default `0` |
+| `lateMinutes` | Int | default `0` |
+| `otWeekday` | Int | default `0` |
+| `otWeekend` | Int | default `0` |
+| `otHoliday` | Int | default `0` |
+| `status` | `AttendanceStatus` | default `OK` |
+| `notes` | String? | หมายเหตุ |
+| `computedAt` | DateTime | default `now()` |
+| `overrideBy` | String? | StackAuth userId |
 | `overrideAt` | DateTime? | เวลาที่แก้ไขด้วยมือ |
-| `createdAt` | DateTime | เวลา record ถูกสร้าง |
+| `createdAt` | DateTime | default `now()` |
+
+**Indexes:** `@@unique([teamId, employeeId, date])`, `@@index([teamId, employeeId, date])`, `@@index([teamId, date])`, `@@index([teamId, date, status])`
 
 ---
 
-## 🎌 **Holiday**
+## 🎌 Holiday
 
-> ตารางวันหยุดของแต่ละองค์กร (override OT / attendance logic)
+> วันหยุดประจำปีหรือพิเศษของแต่ละทีม
 
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String | Primary key |
-| `orgId` | String | องค์กรที่กำหนดวันหยุด |
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String (CUID) | Primary key |
+| `teamId` | String | Multi-tenant isolation |
 | `date` | DateTime | วันที่หยุด |
-| `kind` | String | ประเภท เช่น `"HOLIDAY"` หรือ `"SPECIAL"` |
+| `kind` | `HolidayKind` | `PUBLIC` \| `COMPANY` \| `SPECIAL` |
 | `name` | String | ชื่อวันหยุด |
-| `createdAt`, `updatedAt` | DateTime | audit timestamps |
+| `createdAt` | DateTime | default `now()` |
+| `updatedAt` | DateTime | auto update |
+
+**Indexes:** `@@unique([teamId, date])`, `@@index([teamId, date])`
 
 ---
 
-## ⚙️ **OtProfile**
+## ⚙️ OtProfile
 
-> กติกาคำนวณ OT ของแต่ละองค์กร (rule engine configuration)
+> เก็บ config สำหรับกติกา OT ต่อทีม และสามารถผูกตรงกับพนักงาน
 
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String | Primary key |
-| `orgId` | String | องค์กรเจ้าของ config |
-| `name` | String | ชื่อโปรไฟล์ เช่น `"Default"` |
-| `json` | Json | กติกา OT ปัจจุบัน เช่น rate, lunch break, bonus |
-| `otProfileSnapshot` | Json? | (optional) สำเนากติกาที่ใช้จริงต่อ period ถ้ามี versioning |
-| `createdAt`, `updatedAt` | DateTime | audit timestamps |
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String (CUID) | Primary key |
+| `teamId` | String | Multi-tenant isolation |
+| `name` | String | default `"Default"` |
+| `json` | Json | rule ปัจจุบัน |
+| `snapshot` | Json? | สำเนา rule (เช่น ขณะ generate payroll) |
+| `createdAt` | DateTime | default `now()` |
+| `updatedAt` | DateTime | auto update |
 
----
-
-## 💵 **PayrollPeriod**
-
-> ช่วงการจ่ายเงินเดือน (งวด 1–15 หรือ 16–สิ้นเดือน)
-
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String | Primary key |
-| `orgId` | String | องค์กร |
-| `title` | String | ชื่อช่วง เช่น `"งวด 1-15 พ.ย. 2025"` |
-| `mode` | Enum | PAY_PERIOD / ROLLING_7_DAYS / ISO_WEEK |
-| `startDate`, `endDate` | DateTime | วันที่เริ่ม–สิ้นสุดงวด |
-| `status` | Enum | `"DRAFT"` หรือ `"FINAL"` |
-| `createdAt`, `updatedAt` | DateTime | audit timestamps |
-| `rows` | Relation → `PayrollRow[]` | รายการเงินเดือนในงวดนี้ |
+**Relations:** `employees` → `Employee[]`  
+**Indexes:** `@@unique([teamId, name])`, `@@index([teamId])`
 
 ---
 
-## 🧾 **PayrollRow**
+## 💵 PayrollPeriod
 
-> แถวสรุปการจ่ายต่อพนักงานในแต่ละงวด (ใช้ทำ slip)
+> กำหนดช่วงการจ่ายเงินเดือนเพื่อ grouping attendance
 
-| Field | Type | Description |
-|--------|------|-------------|
-| `id` | String | Primary key |
-| `orgId` | String | องค์กร |
-| `periodId` | String | อ้างถึง `PayrollPeriod` |
-| `employeeId` | String | พนักงานในงวดนั้น |
-| `basePay` | Decimal | เงินเดือนพื้นฐาน (ตามจำนวนวันทำงาน) |
-| `otPay` | Decimal | ค่าล่วงเวลา |
-| `lateDeduction` | Decimal | หักมาสาย |
-| `ssf` | Decimal | ประกันสังคม (5% capped 750฿) |
-| `adjustments` | Decimal | ปรับเพิ่ม/ลดด้วยมือ |
-| `adjustNote` | String? | เหตุผลของการปรับ |
-| `adjustBy` | String? | ผู้แก้ไข |
-| `netPay` | Decimal | เงินสุทธิหลังหักทุกอย่าง |
-| `workMinutes`, `otMinutes`, `lateMinutes` | Int | ตัวเลขดิบ (ช่วยตรวจสอบ) |
-| `data` | Json? | snapshot ของ rule/config ที่ใช้คำนวณตอนนั้น |
-| `createdAt`, `updatedAt` | DateTime | audit timestamps |
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String (CUID) | Primary key |
+| `teamId` | String | Multi-tenant isolation |
+| `title` | String | เช่น `งวด 1-15 พ.ย. 2025` |
+| `mode` | `PayrollMode` | `PAY_PERIOD` \| `ROLLING_7_DAYS` \| `ISO_WEEK` |
+| `startDate` | DateTime | วันเริ่มงวด |
+| `endDate` | DateTime | วันสิ้นสุดงวด |
+| `status` | `PayrollStatus` | default `DRAFT` |
+| `otProfileSnapshot` | Json? | Snapshot ของ OT config |
+| `timezone` | String? | เช่น `Asia/Bangkok` |
+| `createdAt` | DateTime | default `now()` |
+| `updatedAt` | DateTime | auto update |
 
----
-
-## ⚙️ Enum Definitions
-
-| Enum | Values | Description |
-|-------|---------|-------------|
-| `SalaryType` | `MONTHLY`, `DAILY` | ประเภทพนักงาน |
-| `CheckKind` | `IN`, `OUT` | ประเภทการสแกน |
-| `PayrollMode` | `PAY_PERIOD`, `ROLLING_7_DAYS`, `ISO_WEEK` | วิธีนับงวดจ่ายเงิน |
-| `PayrollStatus` | `DRAFT`, `FINAL` | สถานะของงวดจ่าย |
+**Relations:** `rows` → `PayrollRow[]`  
+**Indexes:** `@@index([teamId, startDate, endDate])`
 
 ---
 
-## 🧩 Data Flow Overview
+## 🧾 PayrollRow
 
-**Face → CheckEvent → AttendanceDay → PayrollRow → Slip**
+> รายการเงินเดือนต่อพนักงานในแต่ละงวด (ใช้สร้าง payslip)
 
-1. `/kiosk` บันทึก CheckEvent (IN/OUT)
-2. Attendance engine รวม event รายวัน → สร้าง/อัปเดต AttendanceDay
-3. Payroll generator รวม AttendanceDay ช่วงงวด → PayrollRow
-4. HR ตรวจแก้ / ปรับ adjustments
-5. สถานะเปลี่ยนเป็น FINAL → พิมพ์ Slip
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String (CUID) | Primary key |
+| `teamId` | String | Multi-tenant isolation |
+| `periodId` | String | FK → `PayrollPeriod.id` (cascade) |
+| `employeeId` | String | FK → `Employee.id` (cascade) |
+| `basePay` | Decimal(12,2) | ค่าจ้างพื้นฐาน |
+| `otPay` | Decimal(12,2) | ค่า OT |
+| `lateDeduction` | Decimal(12,2) | หักมาสาย |
+| `ssf` | Decimal(12,2) | เงินประกันสังคม |
+| `adjustments` | Decimal(12,2) | ปรับเพิ่มลด |
+| `adjustNote` | String? | บันทึกการปรับ |
+| `adjustBy` | String? | StackAuth userId |
+| `netPay` | Decimal(12,2) | เงินสุทธิ |
+| `workMinutes` | Int | default `0` |
+| `otMinutes` | Int | default `0` |
+| `lateMinutes` | Int | default `0` |
+| `data` | Json? | Snapshot ตอนคำนวณ |
+| `createdAt` | DateTime | default `now()` |
+| `updatedAt` | DateTime | auto update |
+
+**Indexes:** `@@unique([teamId, periodId, employeeId])`, `@@index([teamId, employeeId, periodId])`, `@@index([teamId, employeeId])`, `@@index([teamId, periodId])`
+
+---
+
+## 🗃️ AuditLog
+
+> เก็บประวัติการเปลี่ยนแปลงหรือกิจกรรมสำคัญของระบบ
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String (CUID) | Primary key |
+| `teamId` | String | Multi-tenant isolation |
+| `entity` | String | ชื่อ entity เช่น `Employee` |
+| `entityId` | String | รหัส entity ที่ได้รับผลกระทบ |
+| `action` | `AuditAction` | ประเภทกิจกรรม |
+| `data` | Json | Snapshot เมื่อเกิด event |
+| `metadata` | Json? | ข้อมูลเสริม เช่น diff, request |
+| `userId` | String? | StackAuth userId ที่กระทำ |
+| `createdAt` | DateTime | default `now()` |
+
+**Indexes:** `@@index([teamId, entity])`, `@@index([teamId, createdAt])`, `@@index([teamId, userId])`
+
+---
+
+## ⚙️ Enums
+
+| Enum | Values | Usage |
+|------|--------|-------|
+| `EmployeeStatus` | `ACTIVE`, `RESIGNED`, `PROBATION`, `SUSPENDED` | สถานะพนักงาน |
+| `SalaryType` | `MONTHLY`, `DAILY` | ประเภทการจ่ายเงิน |
+| `CheckKind` | `IN`, `OUT` | ชนิดของ check event |
+| `PayrollStatus` | `DRAFT`, `FINAL` | สถานะปิดงวด |
+| `PayrollMode` | `PAY_PERIOD`, `ROLLING_7_DAYS`, `ISO_WEEK` | สูตรแบ่งงวด |
+| `AttendanceStatus` | `OK`, `ABSENT`, `LATE`, `LEAVE` | ผลสรุป attendance |
+| `HolidayKind` | `PUBLIC`, `COMPANY`, `SPECIAL` | ประเภทวันหยุด |
+| `AuditAction` | `CREATE`, `UPDATE`, `DELETE`, `LOGIN`, `LOGOUT`, `SYNC`, `GENERATE` | ประเภทกิจกรรม audit |
+
+---
+
+## 🧩 Data Flow Summary
+
+`FaceEmbedding` → `CheckEvent` → `AttendanceDay` → `PayrollRow` → Payslip  
+Attendance engine จะ update `AttendanceDay` เมื่อมี `CheckEvent` ใหม่ และ payroll generator รวมข้อมูลเหล่านี้ต่อ `PayrollPeriod` ตาม `teamId`; การเปลี่ยนแปลงสำคัญจะถูกบันทึกไว้ใน `AuditLog`.

@@ -7,58 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Organization {
-  id          String     @id @default(cuid())
-  name        String
-  locale      String?
-  timezone    String?
-  otProfileId String?    @unique
-  otProfile   OtProfile? @relation(fields: [otProfileId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+// =====================================================
+// ENUMS
+// =====================================================
 
-  users     User[]
-  employees Employee[]
-  holidays  Holiday[]
-  payrolls  PayrollPeriod[]
-}
-
-model User {
-  id    String       @id
-  orgId String
-  org   Organization @relation(fields: [orgId], references: [id])
-
-  email String @unique
-  role  String @default("ADMIN")
-  name  String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Employee {
-  id          String       @id @default(cuid())
-  orgId       String
-  org         Organization @relation(fields: [orgId], references: [id])
-  code        String
-  name        String
-  position    String?
-  department  String?
-  salaryType  SalaryType
-  baseSalary  Decimal      @db.Decimal(12, 2)
-  otEligible  Boolean      @default(true)
-  ssfEligible Boolean      @default(true)
-  active      Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  faces       FaceEmbedding[]
-  checkEvents CheckEvent[]
-  attendance  AttendanceDay[]
-  payrollRows PayrollRow[]
-
-  @@unique([orgId, code])
-  @@index([orgId, active])
+enum EmployeeStatus {
+  ACTIVE
+  RESIGNED
+  PROBATION
+  SUSPENDED
 }
 
 enum SalaryType {
@@ -66,107 +23,9 @@ enum SalaryType {
   DAILY
 }
 
-model FaceEmbedding {
-  id           String   @id @default(cuid())
-  orgId        String
-  employeeId   String
-  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  vector       Bytes
-  version      String
-  embeddingDim Int      @default(512)
-  createdAt    DateTime @default(now())
-
-  @@index([orgId, employeeId])
-}
-
-model CheckEvent {
-  id         String    @id @default(cuid())
-  orgId      String
-  employeeId String
-  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  kind       CheckKind
-  ts         DateTime
-  source     String?
-  timezone   String?
-  liveness   Boolean   @default(false)
-  latitude   Decimal?  @db.Decimal(9, 6)
-  longitude  Decimal?  @db.Decimal(9, 6)
-  accuracy   Decimal?  @db.Decimal(5, 2)
-  createdAt  DateTime  @default(now())
-
-  @@index([orgId, ts])
-  @@index([orgId, employeeId, ts])
-}
-
 enum CheckKind {
   IN
   OUT
-}
-
-model AttendanceDay {
-  id          String    @id @default(cuid())
-  orgId       String
-  employeeId  String
-  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  date        DateTime
-  workMinutes Int       @default(0)
-  lateMinutes Int       @default(0)
-  otWeekday   Int       @default(0)
-  otWeekend   Int       @default(0)
-  otHoliday   Int       @default(0)
-  status      String    @default("OK")
-  notes       String?
-  computedAt  DateTime  @default(now())
-  overrideBy  String?
-  overrideAt  DateTime?
-  createdAt   DateTime  @default(now())
-
-  @@unique([orgId, employeeId, date])
-  @@index([orgId, date])
-  @@index([orgId, date, status])
-}
-
-model Holiday {
-  id        String       @id @default(cuid())
-  orgId     String
-  org       Organization @relation(fields: [orgId], references: [id])
-  date      DateTime
-  kind      String
-  name      String
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  @@unique([orgId, date])
-  @@index([orgId, date])
-}
-
-model OtProfile {
-  id                String        @id @default(cuid())
-  org               Organization?
-  name              String        @default("Default")
-  json              Json
-  otProfileSnapshot Json?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-
-  @@index([id])
-}
-
-model PayrollPeriod {
-  id        String        @id @default(cuid())
-  orgId     String
-  org       Organization  @relation(fields: [orgId], references: [id])
-  title     String
-  mode      PayrollMode
-  startDate DateTime
-  endDate   DateTime
-  status    PayrollStatus @default(DRAFT)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-
-  rows PayrollRow[]
-
-  @@index([orgId, startDate, endDate])
 }
 
 enum PayrollStatus {
@@ -180,9 +39,177 @@ enum PayrollMode {
   ISO_WEEK
 }
 
+enum AttendanceStatus {
+  OK
+  ABSENT
+  LATE
+  LEAVE
+}
+
+enum HolidayKind {
+  PUBLIC
+  COMPANY
+  SPECIAL
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  SYNC
+  GENERATE
+}
+
+// =====================================================
+// CORE MODELS
+// =====================================================
+
+model Employee {
+  id          String         @id @default(cuid())
+  teamId      String // comes from StackAuth Team ID
+  code        String
+  name        String
+  position    String?
+  department  String?
+  salaryType  SalaryType
+  baseSalary  Decimal        @db.Decimal(12, 2)
+  otEligible  Boolean        @default(true)
+  ssfEligible Boolean        @default(true)
+  status      EmployeeStatus @default(ACTIVE)
+  active      Boolean        @default(true)
+
+  otProfileId String?
+  otProfile   OtProfile? @relation(fields: [otProfileId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  faces       FaceEmbedding[]
+  checkEvents CheckEvent[]
+  attendance  AttendanceDay[]
+  payrollRows PayrollRow[]
+
+  @@unique([teamId, code])
+  @@index([teamId, active])
+}
+
+// =====================================================
+// FACE EMBEDDING & ATTENDANCE
+// =====================================================
+
+model FaceEmbedding {
+  id           String   @id @default(cuid())
+  teamId       String
+  employeeId   String
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  vector       Bytes
+  version      String
+  embeddingDim Int      @default(512)
+  createdAt    DateTime @default(now())
+
+  @@index([teamId, employeeId])
+}
+
+model CheckEvent {
+  id         String    @id @default(cuid())
+  teamId     String
+  employeeId String
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  kind       CheckKind
+  ts         DateTime
+  source     String?
+  timezone   String?
+  liveness   Boolean   @default(false)
+  latitude   Decimal?  @db.Decimal(9, 6)
+  longitude  Decimal?  @db.Decimal(9, 6)
+  accuracy   Decimal?  @db.Decimal(5, 2)
+  createdAt  DateTime  @default(now())
+
+  @@index([teamId, ts])
+  @@index([teamId, employeeId, ts])
+}
+
+model AttendanceDay {
+  id          String           @id @default(cuid())
+  teamId      String
+  employeeId  String
+  employee    Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  date        DateTime
+  workMinutes Int              @default(0)
+  lateMinutes Int              @default(0)
+  otWeekday   Int              @default(0)
+  otWeekend   Int              @default(0)
+  otHoliday   Int              @default(0)
+  status      AttendanceStatus @default(OK)
+  notes       String?
+  computedAt  DateTime         @default(now())
+  overrideBy  String? // StackAuth userId (plain string)
+  overrideAt  DateTime?
+  createdAt   DateTime         @default(now())
+
+  @@unique([teamId, employeeId, date])
+  @@index([teamId, employeeId, date])
+  @@index([teamId, date])
+  @@index([teamId, date, status])
+}
+
+// =====================================================
+// HOLIDAY & PAYROLL
+// =====================================================
+
+model Holiday {
+  id        String      @id @default(cuid())
+  teamId    String
+  date      DateTime
+  kind      HolidayKind
+  name      String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([teamId, date])
+  @@index([teamId, date])
+}
+
+model OtProfile {
+  id        String   @id @default(cuid())
+  teamId    String
+  name      String   @default("Default")
+  json      Json
+  snapshot  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employees Employee[]
+
+  @@unique([teamId, name])
+  @@index([teamId])
+}
+
+model PayrollPeriod {
+  id                String        @id @default(cuid())
+  teamId            String
+  title             String
+  mode              PayrollMode
+  startDate         DateTime
+  endDate           DateTime
+  status            PayrollStatus @default(DRAFT)
+  otProfileSnapshot Json?
+  timezone          String? // e.g. "Asia/Bangkok"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rows PayrollRow[]
+
+  @@index([teamId, startDate, endDate])
+}
+
 model PayrollRow {
   id            String        @id @default(cuid())
-  orgId         String
+  teamId        String
   periodId      String
   period        PayrollPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
   employeeId    String
@@ -193,7 +220,7 @@ model PayrollRow {
   ssf           Decimal       @db.Decimal(12, 2)
   adjustments   Decimal       @db.Decimal(12, 2)
   adjustNote    String?
-  adjustBy      String?
+  adjustBy      String? // StackAuth userId (plain string)
   netPay        Decimal       @db.Decimal(12, 2)
   workMinutes   Int           @default(0)
   otMinutes     Int           @default(0)
@@ -202,7 +229,27 @@ model PayrollRow {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  @@unique([orgId, periodId, employeeId])
-  @@index([orgId, employeeId])
-  @@index([orgId, periodId])
+  @@unique([teamId, periodId, employeeId])
+  @@index([teamId, employeeId, periodId])
+  @@index([teamId, employeeId])
+  @@index([teamId, periodId])
+}
+
+// =====================================================
+// AUDIT LOGS
+// =====================================================
+model AuditLog {
+  id        String      @id @default(cuid())
+  teamId    String
+  entity    String // e.g. "Employee", "PayrollRow", "AttendanceDay"
+  entityId  String // the ID of the entity being acted upon
+  action    AuditAction
+  data      Json // snapshot of the entity data
+  metadata  Json?
+  userId    String?
+  createdAt DateTime    @default(now())
+
+  @@index([teamId, entity])
+  @@index([teamId, createdAt])
+  @@index([teamId, userId])
 }
