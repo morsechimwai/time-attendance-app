@@ -3,6 +3,40 @@
 import { NextRequest, NextResponse } from "next/server"
 import { stackServerApp } from "@/stack/server"
 
+type StackUser = Awaited<ReturnType<typeof stackServerApp.getUser>>
+const USER_CACHE_TTL_MS = 60 * 1000 // 1 minute
+const USER_CACHE_MAX_ENTRIES = 1000 // max 1000 users in cache
+
+const userCache = new Map<string, { value: StackUser; expiresAt: number }>()
+
+function evictIfNeeded() {
+  if (userCache.size <= USER_CACHE_MAX_ENTRIES) {
+    return
+  }
+  const firstKey = userCache.keys().next()
+  if (!firstKey.done) {
+    userCache.delete(firstKey.value)
+  }
+}
+
+async function resolveUser(request: NextRequest): Promise<StackUser> {
+  const cacheKey = request.headers.get("cookie") ?? ""
+  if (!cacheKey) {
+    return stackServerApp.getUser({ tokenStore: request }).catch(() => null)
+  }
+
+  const now = Date.now()
+  const cached = userCache.get(cacheKey)
+  if (cached && cached.expiresAt > now) {
+    return cached.value
+  }
+
+  const user = await stackServerApp.getUser({ tokenStore: request }).catch(() => null)
+  userCache.set(cacheKey, { value: user, expiresAt: now + USER_CACHE_TTL_MS })
+  evictIfNeeded()
+  return user
+}
+
 // ------------------------------
 // CONFIG
 // ------------------------------
@@ -53,7 +87,7 @@ export async function proxy(request: NextRequest) {
 
   // Redirect authenticated users hitting the home page to their team dashboard
   if (pathname === "/") {
-    const user = await stackServerApp.getUser({ tokenStore: request }).catch(() => null)
+    const user = await resolveUser(request)
 
     const selectedTeam = user?.selectedTeam
     if (selectedTeam?.id) {
@@ -70,7 +104,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Authenticate user
-  const user = await stackServerApp.getUser({ tokenStore: request }).catch(() => null)
+  const user = await resolveUser(request)
 
   // Redirect to signin if no user
   if (!user) {
