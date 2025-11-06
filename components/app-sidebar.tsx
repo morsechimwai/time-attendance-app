@@ -8,7 +8,14 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 // Icons
-import { Banknote, Clock, LayoutDashboard, LucideIcon, Users } from "lucide-react"
+import {
+  Banknote,
+  Clock,
+  LayoutDashboard,
+  LucideIcon,
+  MessageCircleMore,
+  Users,
+} from "lucide-react"
 
 // Components
 import {
@@ -29,6 +36,7 @@ import {
 import { isActive, withTeamPath } from "@/lib/utils/navigation"
 import { SelectedTeamSwitcher, UserButton, useUser } from "@stackframe/stack"
 import { useTheme } from "next-themes"
+import { Button } from "./ui/button"
 
 interface NavigationItem {
   label: string
@@ -83,9 +91,6 @@ export default function AppSidebar({ teamId }: AppSidebarProps = {}) {
   // Current pathname
   const pathname = usePathname()
 
-  // Theme
-  const { theme, setTheme } = useTheme()
-
   // Sidebar state
   const { isMobile, setOpenMobile } = useSidebar()
 
@@ -103,10 +108,10 @@ export default function AppSidebar({ teamId }: AppSidebarProps = {}) {
     }
   }, [isMobile, setOpenMobile])
 
-  // Theme toggle
-  const handleThemeToggle = useCallback(() => {
-    setTheme(theme === "light" ? "dark" : "light")
-  }, [theme, setTheme])
+  // Feedback handler
+  const handleFeedback = () => {
+    console.log("Feedback button clicked")
+  }
 
   // Close sidebar on navigation (mobile)
   useEffect(() => {
@@ -118,10 +123,10 @@ export default function AppSidebar({ teamId }: AppSidebarProps = {}) {
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader className="h-(--header-height) border-b">
-        <div className="space-y-1.5">
+        <div className="px-2">
           <SelectedTeamSwitcher
             selectedTeam={currentTeam ?? undefined}
-            triggerClassName="w-full justify-between"
+            triggerClassName="border-0 ring-0 bg-transparent hover:bg-transparent focus:bg-transparent"
           />
         </div>
       </SidebarHeader>
@@ -148,9 +153,7 @@ export default function AppSidebar({ teamId }: AppSidebarProps = {}) {
                           >
                             <Link href={targetHref} onClick={handleNavigate}>
                               <item.icon />
-                              <span className="capitalize font-sans font-semibold">
-                                {item.label}
-                              </span>
+                              <span className="capitalize font-sans">{item.label}</span>
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -165,7 +168,12 @@ export default function AppSidebar({ teamId }: AppSidebarProps = {}) {
       </SidebarContent>
 
       <SidebarFooter className="mt-auto border-t">
-        <UserButton showUserInfo={true} colorModeToggle={handleThemeToggle} />
+        <div className="p-2">
+          <Button className="w-full" variant="outline" onClick={handleFeedback}>
+            <MessageCircleMore />
+            <span>Feedback</span>
+          </Button>
+        </div>
       </SidebarFooter>
     </Sidebar>
   )

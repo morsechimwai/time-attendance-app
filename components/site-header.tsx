@@ -16,16 +16,22 @@ import {
 
 // Utils
 import { normalizePath } from "@/lib/utils/navigation"
-import { MessageCircleMore } from "lucide-react"
+import { UserButton } from "@stackframe/stack"
+import { useTheme } from "next-themes"
+import { useCallback } from "react"
+import { CircleQuestionMark } from "lucide-react"
 
 export default function SiteHeader() {
   // Get current pathname
   const pathname = usePathname()
 
-  // Feedback handler
-  const handleFeedback = () => {
-    console.log("Feedback button clicked")
-  }
+  // Theme
+  const { theme, setTheme } = useTheme()
+
+  // Theme toggle
+  const handleThemeToggle = useCallback(() => {
+    setTheme(theme === "light" ? "dark" : "light")
+  }, [theme, setTheme])
 
   // Determine current path name
   const currentPath =
@@ -53,11 +59,13 @@ export default function SiteHeader() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="ml-auto flex items-center gap-2 font-sans">
-          <Button size="sm" variant="outline" onClick={handleFeedback}>
-            <MessageCircleMore />
-            <span>Feedback</span>
+        <div className="ml-auto flex items-center gap-1 lg:gap-2 font-sans">
+          <Button variant="ghost" size="sm">
+            <CircleQuestionMark />
           </Button>
+          <div className="p-2 mt-2">
+            <UserButton colorModeToggle={handleThemeToggle} />
+          </div>
         </div>
       </div>
     </header>
