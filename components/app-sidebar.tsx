@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/sidebar"
 
 // Utils
-import { isActive } from "@/lib/utils/navigation"
+import { isActive, withTeamPath } from "@/lib/utils/navigation"
 import { SelectedTeamSwitcher, UserButton, useUser } from "@stackframe/stack"
 import { useTheme } from "next-themes"
 
@@ -39,6 +39,10 @@ interface NavigationItem {
 interface NavigationGroup {
   label: string
   items: NavigationItem[]
+}
+
+interface AppSidebarProps {
+  teamId?: string
 }
 
 // Navigation items
@@ -75,7 +79,7 @@ const navigationGroups: NavigationGroup[] = [
   },
 ]
 
-export default function AppSidebar() {
+export default function AppSidebar({ teamId }: AppSidebarProps = {}) {
   // Current pathname
   const pathname = usePathname()
 
@@ -88,6 +92,9 @@ export default function AppSidebar() {
   // Stack Auth
   const user = useUser()
   const currentTeam = user?.selectedTeam ?? null
+
+  // Determine the team context for navigation
+  const activeTeamId = teamId ?? currentTeam?.id ?? null
 
   // Handlers
   const handleNavigate = useCallback(() => {
@@ -111,11 +118,12 @@ export default function AppSidebar() {
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader className="h-(--header-height) border-b">
-        <SidebarMenuButton variant="default" asChild>
-          <Link className="flex items-center h-full px-4" href="#" onClick={handleNavigate}>
-            <span className="text-xl font-black font-sans ">FaceIN</span>
-          </Link>
-        </SidebarMenuButton>
+        <div className="space-y-1.5">
+          <SelectedTeamSwitcher
+            selectedTeam={currentTeam ?? undefined}
+            triggerClassName="w-full justify-between"
+          />
+        </div>
       </SidebarHeader>
 
       <SidebarContent className="px-2">
@@ -129,7 +137,8 @@ export default function AppSidebar() {
                 <SidebarMenu>
                   <div className="space-y-1">
                     {group.items.map((item) => {
-                      const active = isActive(pathname, item.href)
+                      const targetHref = withTeamPath(activeTeamId, item.href)
+                      const active = isActive(pathname, targetHref)
                       return (
                         <SidebarMenuItem key={item.label}>
                           <SidebarMenuButton
@@ -137,7 +146,7 @@ export default function AppSidebar() {
                             isActive={active}
                             aria-current={active ? "page" : undefined}
                           >
-                            <Link href={item.href} onClick={handleNavigate}>
+                            <Link href={targetHref} onClick={handleNavigate}>
                               <item.icon />
                               <span className="capitalize font-sans font-semibold">
                                 {item.label}
@@ -154,14 +163,7 @@ export default function AppSidebar() {
           ))}
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="mt-auto border-t">
-        <div className="space-y-1.5">
-          <SelectedTeamSwitcher
-            selectedTeam={currentTeam ?? undefined}
-            triggerClassName="w-full justify-between"
-          />
-        </div>
-      </SidebarFooter>
+
       <SidebarFooter className="mt-auto border-t">
         <UserButton showUserInfo={true} colorModeToggle={handleThemeToggle} />
       </SidebarFooter>

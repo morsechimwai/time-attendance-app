@@ -16,12 +16,17 @@ export const metadata: Metadata = {
 
 export default async function ProtectedLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode
+  params?: { [key: string]: string | string[] }
 }>) {
+  const paramTeamId = params?.id
+  const teamId = Array.isArray(paramTeamId) ? paramTeamId[0] : paramTeamId
+
   return (
     <>
-      <AppSidebar />
+      <AppSidebar teamId={teamId} />
       <main className="w-full min-h-screen">
         <SiteHeader />
         {children}
