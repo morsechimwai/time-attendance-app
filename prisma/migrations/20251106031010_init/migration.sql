@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "EmployeeStatus" AS ENUM ('ACTIVE', 'RESIGNED', 'PROBATION', 'SUSPENDED');
+
+-- CreateEnum
 CREATE TYPE "SalaryType" AS ENUM ('MONTHLY', 'DAILY');
 
 -- CreateEnum
@@ -10,35 +13,19 @@ CREATE TYPE "PayrollStatus" AS ENUM ('DRAFT', 'FINAL');
 -- CreateEnum
 CREATE TYPE "PayrollMode" AS ENUM ('PAY_PERIOD', 'ROLLING_7_DAYS', 'ISO_WEEK');
 
--- CreateTable
-CREATE TABLE "Organization" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "locale" TEXT,
-    "timezone" TEXT,
-    "otProfileId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateEnum
+CREATE TYPE "AttendanceStatus" AS ENUM ('OK', 'ABSENT', 'LATE', 'LEAVE');
 
-    CONSTRAINT "Organization_pkey" PRIMARY KEY ("id")
-);
+-- CreateEnum
+CREATE TYPE "HolidayKind" AS ENUM ('PUBLIC', 'COMPANY', 'SPECIAL');
 
--- CreateTable
-CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "role" TEXT NOT NULL DEFAULT 'ADMIN',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
+-- CreateEnum
+CREATE TYPE "AuditAction" AS ENUM ('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'SYNC', 'GENERATE');
 
 -- CreateTable
 CREATE TABLE "Employee" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "position" TEXT,
@@ -47,7 +34,9 @@ CREATE TABLE "Employee" (
     "baseSalary" DECIMAL(12,2) NOT NULL,
     "otEligible" BOOLEAN NOT NULL DEFAULT true,
     "ssfEligible" BOOLEAN NOT NULL DEFAULT true,
+    "status" "EmployeeStatus" NOT NULL DEFAULT 'ACTIVE',
     "active" BOOLEAN NOT NULL DEFAULT true,
+    "otProfileId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -57,7 +46,7 @@ CREATE TABLE "Employee" (
 -- CreateTable
 CREATE TABLE "FaceEmbedding" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "employeeId" TEXT NOT NULL,
     "vector" BYTEA NOT NULL,
     "version" TEXT NOT NULL,
@@ -70,7 +59,7 @@ CREATE TABLE "FaceEmbedding" (
 -- CreateTable
 CREATE TABLE "CheckEvent" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "employeeId" TEXT NOT NULL,
     "kind" "CheckKind" NOT NULL,
     "ts" TIMESTAMP(3) NOT NULL,
@@ -88,7 +77,7 @@ CREATE TABLE "CheckEvent" (
 -- CreateTable
 CREATE TABLE "AttendanceDay" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "employeeId" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "workMinutes" INTEGER NOT NULL DEFAULT 0,
@@ -96,7 +85,7 @@ CREATE TABLE "AttendanceDay" (
     "otWeekday" INTEGER NOT NULL DEFAULT 0,
     "otWeekend" INTEGER NOT NULL DEFAULT 0,
     "otHoliday" INTEGER NOT NULL DEFAULT 0,
-    "status" TEXT NOT NULL DEFAULT 'OK',
+    "status" "AttendanceStatus" NOT NULL DEFAULT 'OK',
     "notes" TEXT,
     "computedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "overrideBy" TEXT,
@@ -109,9 +98,9 @@ CREATE TABLE "AttendanceDay" (
 -- CreateTable
 CREATE TABLE "Holiday" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "kind" TEXT NOT NULL,
+    "kind" "HolidayKind" NOT NULL,
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -122,9 +111,10 @@ CREATE TABLE "Holiday" (
 -- CreateTable
 CREATE TABLE "OtProfile" (
     "id" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "name" TEXT NOT NULL DEFAULT 'Default',
     "json" JSONB NOT NULL,
-    "otProfileSnapshot" JSONB,
+    "snapshot" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -134,12 +124,14 @@ CREATE TABLE "OtProfile" (
 -- CreateTable
 CREATE TABLE "PayrollPeriod" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "mode" "PayrollMode" NOT NULL,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
     "status" "PayrollStatus" NOT NULL DEFAULT 'DRAFT',
+    "otProfileSnapshot" JSONB,
+    "timezone" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -149,7 +141,7 @@ CREATE TABLE "PayrollPeriod" (
 -- CreateTable
 CREATE TABLE "PayrollRow" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "periodId" TEXT NOT NULL,
     "employeeId" TEXT NOT NULL,
     "basePay" DECIMAL(12,2) NOT NULL,
@@ -170,65 +162,86 @@ CREATE TABLE "PayrollRow" (
     CONSTRAINT "PayrollRow_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "Organization_otProfileId_key" ON "Organization"("otProfileId");
+-- CreateTable
+CREATE TABLE "AuditLog" (
+    "id" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
+    "entity" TEXT NOT NULL,
+    "entityId" TEXT NOT NULL,
+    "action" "AuditAction" NOT NULL,
+    "data" JSONB NOT NULL,
+    "metadata" JSONB,
+    "userId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AuditLog_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE INDEX "Employee_teamId_active_idx" ON "Employee"("teamId", "active");
 
 -- CreateIndex
-CREATE INDEX "Employee_orgId_active_idx" ON "Employee"("orgId", "active");
+CREATE UNIQUE INDEX "Employee_teamId_code_key" ON "Employee"("teamId", "code");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Employee_orgId_code_key" ON "Employee"("orgId", "code");
+CREATE INDEX "FaceEmbedding_teamId_employeeId_idx" ON "FaceEmbedding"("teamId", "employeeId");
 
 -- CreateIndex
-CREATE INDEX "FaceEmbedding_orgId_employeeId_idx" ON "FaceEmbedding"("orgId", "employeeId");
+CREATE INDEX "CheckEvent_teamId_ts_idx" ON "CheckEvent"("teamId", "ts");
 
 -- CreateIndex
-CREATE INDEX "CheckEvent_orgId_ts_idx" ON "CheckEvent"("orgId", "ts");
+CREATE INDEX "CheckEvent_teamId_employeeId_ts_idx" ON "CheckEvent"("teamId", "employeeId", "ts");
 
 -- CreateIndex
-CREATE INDEX "CheckEvent_orgId_employeeId_ts_idx" ON "CheckEvent"("orgId", "employeeId", "ts");
+CREATE INDEX "AttendanceDay_teamId_employeeId_date_idx" ON "AttendanceDay"("teamId", "employeeId", "date");
 
 -- CreateIndex
-CREATE INDEX "AttendanceDay_orgId_date_idx" ON "AttendanceDay"("orgId", "date");
+CREATE INDEX "AttendanceDay_teamId_date_idx" ON "AttendanceDay"("teamId", "date");
 
 -- CreateIndex
-CREATE INDEX "AttendanceDay_orgId_date_status_idx" ON "AttendanceDay"("orgId", "date", "status");
+CREATE INDEX "AttendanceDay_teamId_date_status_idx" ON "AttendanceDay"("teamId", "date", "status");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "AttendanceDay_orgId_employeeId_date_key" ON "AttendanceDay"("orgId", "employeeId", "date");
+CREATE UNIQUE INDEX "AttendanceDay_teamId_employeeId_date_key" ON "AttendanceDay"("teamId", "employeeId", "date");
 
 -- CreateIndex
-CREATE INDEX "Holiday_orgId_date_idx" ON "Holiday"("orgId", "date");
+CREATE INDEX "Holiday_teamId_date_idx" ON "Holiday"("teamId", "date");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Holiday_orgId_date_key" ON "Holiday"("orgId", "date");
+CREATE UNIQUE INDEX "Holiday_teamId_date_key" ON "Holiday"("teamId", "date");
 
 -- CreateIndex
-CREATE INDEX "OtProfile_id_idx" ON "OtProfile"("id");
+CREATE INDEX "OtProfile_teamId_idx" ON "OtProfile"("teamId");
 
 -- CreateIndex
-CREATE INDEX "PayrollPeriod_orgId_startDate_endDate_idx" ON "PayrollPeriod"("orgId", "startDate", "endDate");
+CREATE UNIQUE INDEX "OtProfile_teamId_name_key" ON "OtProfile"("teamId", "name");
 
 -- CreateIndex
-CREATE INDEX "PayrollRow_orgId_employeeId_idx" ON "PayrollRow"("orgId", "employeeId");
+CREATE INDEX "PayrollPeriod_teamId_startDate_endDate_idx" ON "PayrollPeriod"("teamId", "startDate", "endDate");
 
 -- CreateIndex
-CREATE INDEX "PayrollRow_orgId_periodId_idx" ON "PayrollRow"("orgId", "periodId");
+CREATE INDEX "PayrollRow_teamId_employeeId_periodId_idx" ON "PayrollRow"("teamId", "employeeId", "periodId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PayrollRow_orgId_periodId_employeeId_key" ON "PayrollRow"("orgId", "periodId", "employeeId");
+CREATE INDEX "PayrollRow_teamId_employeeId_idx" ON "PayrollRow"("teamId", "employeeId");
+
+-- CreateIndex
+CREATE INDEX "PayrollRow_teamId_periodId_idx" ON "PayrollRow"("teamId", "periodId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PayrollRow_teamId_periodId_employeeId_key" ON "PayrollRow"("teamId", "periodId", "employeeId");
+
+-- CreateIndex
+CREATE INDEX "AuditLog_teamId_entity_idx" ON "AuditLog"("teamId", "entity");
+
+-- CreateIndex
+CREATE INDEX "AuditLog_teamId_createdAt_idx" ON "AuditLog"("teamId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "AuditLog_teamId_userId_idx" ON "AuditLog"("teamId", "userId");
 
 -- AddForeignKey
-ALTER TABLE "Organization" ADD CONSTRAINT "Organization_otProfileId_fkey" FOREIGN KEY ("otProfileId") REFERENCES "OtProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Employee" ADD CONSTRAINT "Employee_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Employee" ADD CONSTRAINT "Employee_otProfileId_fkey" FOREIGN KEY ("otProfileId") REFERENCES "OtProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FaceEmbedding" ADD CONSTRAINT "FaceEmbedding_employeeId_fkey" FOREIGN KEY ("employeeId") REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -238,12 +251,6 @@ ALTER TABLE "CheckEvent" ADD CONSTRAINT "CheckEvent_employeeId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "AttendanceDay" ADD CONSTRAINT "AttendanceDay_employeeId_fkey" FOREIGN KEY ("employeeId") REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Holiday" ADD CONSTRAINT "Holiday_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "PayrollPeriod" ADD CONSTRAINT "PayrollPeriod_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PayrollRow" ADD CONSTRAINT "PayrollRow_periodId_fkey" FOREIGN KEY ("periodId") REFERENCES "PayrollPeriod"("id") ON DELETE CASCADE ON UPDATE CASCADE;
