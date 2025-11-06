@@ -2,69 +2,63 @@
 
 ## Overview
 
-A multi-tenant SaaS system for Thai SMEs and factories to manage face-based attendance and advanced payroll with OT logic, social security, and rule engine support.
+Multi-tenant SaaS for Thai SMEs/factories to manage face-based time tracking and payroll. Tenancy is enforced through StackAuth teams (`teamId` on every core record).
 
 ---
 
 ## Roles & Access
 
-* **Admin only** (MVP) — Employees don't login, they only use Kiosk
-* Future roles prepared via guard functions
+- **Admin only (MVP)** — HR/Admin users sign in via StackAuth. Employees do not log in; they interact through kiosk capture.
+- Future roles can attach to StackAuth permissions (guard layer prepared).
 
 ---
 
 ## Core Modules
 
-### 1) Authentication & Organization
+### 1) Authentication & Team Context
 
-* Login via StackAuth
-* Organization membership (single-org per user MVP)
-* Tenant isolation on all data
+- Login/signup handled by StackAuth (Next StackProvider on client, StackServerApp on server).
+- Users belong to exactly one StackAuth team in MVP.
+- Middleware sets headers (`x-facein-user-*`, `x-facein-team-id`) for server components/services.
+- Server helpers (`requireAuthContext`) enforce authenticated access.
 
 ### 2) Employee Management
 
-* Add / Edit / Disable employee
-* Fields:
-
-  * Name, Position, Department
-  * Salary type: Monthly / Daily
-  * Base salary
-  * OT eligible
-  * Social security flag
-  * Face image + embeddings
-* Quick inline edit for payroll fields
+- Create / edit / soft-disable employees per team.
+- Fields:
+  - Name, Position, Department
+  - Status enum: `ACTIVE`, `RESIGNED`, `PROBATION`, `SUSPENDED`
+  - Payroll metadata: salary type (`MONTHLY` / `DAILY`), base salary, OT eligibility, SSF eligibility
+  - OT profile link (optional, per employee override)
+  - Audit timestamps (created/updated)
+- Face embeddings stored separately (see module 3).
 
 ### 3) Face Attendance (Kiosk)
 
-* Route: `/kiosk`
-* Fullscreen mode
-* Buttons: **Check-in** / **Check-out**
-* Face detect → match → basic liveness
-* Success feedback with employee name & time
-* One check-in + one check-out per day
+- Route `/kiosk` runs in fullscreen kiosk mode.
+- Flow: camera capture → embedding match → optional liveness flag.
+- Logs `CheckEvent` with geolocation metadata when available.
+- UI buttons: **Check-in** / **Check-out** (maps to `CheckKind` enum).
 
 ### 4) Attendance Engine
 
-* Auto compute per day:
-
-  * work minutes
-  * late minutes
-  * OT minutes (weekday / weekend / holiday)
-  * lunch deduction logic (60 min default)
-* **8-hour daily threshold:** OT starts after 8 hours
-* Consecutive days rule:
-
-  * If work ≥ 7 consecutive days → next day OT full day
-* Manual override for HR
+- Aggregates `CheckEvent` data into `AttendanceDay`.
+- Stored metrics:
+  - workMinutes, lateMinutes
+  - OT minutes split by weekday/weekend/holiday
+  - Status enum: `OK`, `ABSENT`, `LATE`, `LEAVE`
+- Manual override supported (`overrideBy`, `overrideAt`, `notes`).
+- Snapshot timestamp (`computedAt`) for recalculation tracking.
+- Lunch deduction, OT thresholds, consecutive-day logic handled by OT rule engine (see module 6).
 
 ### 5) Holiday
 
-* Org-defined holiday table
-* Holidays override OT type (holiday > weekend > weekday)
+- Team-defined holidays with enum kind: `PUBLIC`, `COMPANY`, `SPECIAL`.
+- Holidays override OT classification priority (holiday > weekend > weekday).
 
 ### 6) OT Rule Profiles (JSON)
 
-Flexible config:
+Rule profiles stored as JSON payload on `OtProfile`. Employees or payroll periods can reference snapshots.
 
 ```
 {
@@ -85,30 +79,31 @@ Flexible config:
 
 ### OT Period Modes
 
-* **PAY_PERIOD** — default payroll period
-* **ROLLING_7_DAYS** — factory / 24/7 rule
-* **ISO_WEEK** — Mon–Sun international mode
+- `PAY_PERIOD` — standard semimonthly/biweekly
+- `ROLLING_7_DAYS` — sliding window for 24/7 operations
+- `ISO_WEEK` — ISO week-based
 
 ### 7) Payroll
 
-* Create payroll period
-* Auto-generate payroll rows
-* Compute:
-
-  * base pay
-  * OT pay
-  * late deduction
-  * social security (5% capped 750฿)
-  * manual adjustment
-  * net pay
-* Status: DRAFT / FINAL
-* Inline spreadsheet-like editing
+- `PayrollPeriod` per team:
+  - Mode (`PayrollMode`), start/end dates, status (`DRAFT` / `FINAL`)
+  - Optional `otProfileSnapshot` + `timezone`
+- Payroll generation creates `PayrollRow` per employee with:
+  - basePay, otPay, lateDeduction, ssf, adjustments, netPay
+  - raw metrics (workMinutes, otMinutes, lateMinutes) for auditing
+  - `adjustNote`, `adjustBy` for manual tweaks
+- Unique constraints prevent duplicate rows per employee/period.
 
 ### 8) Salary Slip
 
-* A6 slip template
-* Preview + Print
-* Fields: Employee, period, base pay, OT, deductions, net
+- Printable slip generator (A6) consuming `PayrollRow` data snapshots.
+- Includes employee info, period, earnings, deductions, net pay.
+
+### 9) Audit Logging
+
+- `AuditLog` table records sensitive operations across entities.
+- Fields: entity name, entityId, action (`CREATE`, `UPDATE`, `DELETE`, `LOGIN`, `LOGOUT`, `SYNC`, `GENERATE`), data snapshot, optional metadata/userId.
+- Indexed by team, entity, createdAt for fast compliance queries.
 
 ---
 
@@ -116,13 +111,13 @@ Flexible config:
 
 ### Navigation Structure
 
-**Main Navigation (Admin Dashboard)**
+- **Dashboard**
+- **Employees**
+- **Attendance**
+- **Payroll**
+- **Settings**
 
-* Dashboard
-* Employees
-* Attendance
-* Payroll
-* Settings
+Additional kiosk route: `/kiosk`
 
 **Navigation Paths**
 
@@ -138,34 +133,13 @@ Flexible config:
 * `/payroll/[periodId]/slip/preview` — slip preview
 * `/payroll/[periodId]/print` — slip print batch
 * `/settings` — org + payroll config
-
-**Kiosk**
-
 * `/kiosk` — face scan terminal
 
 ---
 
 ## Pages / Routes
 
-**Admin**
-
-* `/auth/login`
-* `/dashboard`
-* `/employees`
-* `/employees/new`
-* `/employees/[id]`
-* `/attendance` — history + manual fix
-* `/payroll`
-* `/payroll/new`
-* `/payroll/[periodId]`
-* `/payroll/[periodId]/employee/[id]`
-* `/payroll/[periodId]/slip/preview`
-* `/payroll/[periodId]/print`
-* `/settings`
-
-**Kiosk**
-
-* `/kiosk`
+StackAuth handles `/signin`, `/signout`, `/signup`; protected app routes listed above. Kiosk (`/kiosk`) stays unauthenticated but isolated.
 
 ---
 
@@ -176,7 +150,7 @@ Flexible config:
 ```
 work = totalMinutes - lunch
 if work > 8h → OT = work - 8h
-streak >= 7 days → OT full day
+streak >= 7 days → OT full day bonus
 holiday > weekend > weekday
 ```
 
@@ -190,10 +164,10 @@ Net = Base + OT + Adjustments - Late - SSF
 
 ## Non-Functional
 
-* Sub-1s face recognition
-* Tenant data isolation
-* Manual override everywhere needed
-* Audit timestamps
+- Sub-1s face recognition target
+- Tenant isolation via StackAuth team IDs + secured middleware headers
+- Manual override where HR needs control
+- Full audit trail (createdAt/updatedAt + `AuditLog`)
 
 ---
 
