@@ -16,10 +16,16 @@ import {
 
 // Utils
 import { normalizePath } from "@/lib/utils/navigation"
+import { MessageCircleMore } from "lucide-react"
 
 export default function SiteHeader() {
   // Get current pathname
   const pathname = usePathname()
+
+  // Feedback handler
+  const handleFeedback = () => {
+    console.log("Feedback button clicked")
+  }
 
   // Determine current path name
   const currentPath =
@@ -48,8 +54,9 @@ export default function SiteHeader() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="ml-auto flex items-center gap-2 font-sans">
-          <Button size="sm" variant="outline">
-            Feedback
+          <Button size="sm" variant="outline" onClick={handleFeedback}>
+            <MessageCircleMore />
+            <span>Feedback</span>
           </Button>
         </div>
       </div>

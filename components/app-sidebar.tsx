@@ -7,23 +7,8 @@ import { useCallback, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-// Navigation
-
 // Icons
-import {
-  Banknote,
-  ChevronsDown,
-  ChevronsRight,
-  CircleDotDashed,
-  Clock,
-  Drama,
-  Flower,
-  Focus,
-  LayoutDashboard,
-  LucideIcon,
-  ScanFace,
-  Users,
-} from "lucide-react"
+import { Banknote, Clock, LayoutDashboard, LucideIcon, Users } from "lucide-react"
 
 // Components
 import {
@@ -42,6 +27,8 @@ import {
 
 // Utils
 import { isActive } from "@/lib/utils/navigation"
+import { SelectedTeamSwitcher, UserButton, useUser } from "@stackframe/stack"
+import { useTheme } from "next-themes"
 
 interface NavigationItem {
   label: string
@@ -92,8 +79,15 @@ export default function AppSidebar() {
   // Current pathname
   const pathname = usePathname()
 
+  // Theme
+  const { theme, setTheme } = useTheme()
+
   // Sidebar state
   const { isMobile, setOpenMobile } = useSidebar()
+
+  // Stack Auth
+  const user = useUser()
+  const currentTeam = user?.selectedTeam ?? null
 
   // Handlers
   const handleNavigate = useCallback(() => {
@@ -101,6 +95,11 @@ export default function AppSidebar() {
       setOpenMobile(false)
     }
   }, [isMobile, setOpenMobile])
+
+  // Theme toggle
+  const handleThemeToggle = useCallback(() => {
+    setTheme(theme === "light" ? "dark" : "light")
+  }, [theme, setTheme])
 
   // Close sidebar on navigation (mobile)
   useEffect(() => {
@@ -118,6 +117,7 @@ export default function AppSidebar() {
           </Link>
         </SidebarMenuButton>
       </SidebarHeader>
+
       <SidebarContent className="px-2 mt-6">
         <SidebarGroup>
           {navigationGroups.map((group) => (
@@ -155,7 +155,15 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="mt-auto border-t">
-        <div className="p-4 text-sm text-zinc-500">USER</div>
+        <div className="space-y-1.5">
+          <SelectedTeamSwitcher
+            selectedTeam={currentTeam ?? undefined}
+            triggerClassName="w-full justify-between"
+          />
+        </div>
+      </SidebarFooter>
+      <SidebarFooter className="mt-auto border-t">
+        <UserButton showUserInfo={true} colorModeToggle={handleThemeToggle} />
       </SidebarFooter>
     </Sidebar>
   )
