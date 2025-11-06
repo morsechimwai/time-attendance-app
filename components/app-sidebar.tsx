@@ -118,8 +118,8 @@ export default function AppSidebar() {
         </SidebarMenuButton>
       </SidebarHeader>
 
-      <SidebarContent className="px-2 mt-6">
-        <SidebarGroup>
+      <SidebarContent className="px-2">
+        <SidebarGroup className="space-y-6">
           {navigationGroups.map((group) => (
             <div key={group.label}>
               <SidebarGroupLabel className="uppercase font-sans font-bold">
