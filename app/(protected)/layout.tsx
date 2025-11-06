@@ -22,7 +22,7 @@ export default async function ProtectedLayout({
   return (
     <>
       <AppSidebar />
-      <main className="w-full">
+      <main className="w-full min-h-screen">
         <SiteHeader />
         {children}
       </main>
