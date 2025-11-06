@@ -1,32 +1,24 @@
 // lib/auth/context.ts
+"use server"
 
-import { headers } from "next/headers"
+import { stackServerApp } from "@/stack/server"
 import { AppError } from "@/lib/errors/app-error"
 
 export type AuthContext = {
   userId: string
-  teamId: string | null
-  email?: string | null
+  teamId?: string | null
 }
 
-/** ใช้ใน server components / services */
+// ใช้สำหรับ layout หรือ page ที่แค่ต้องรู้ว่ามี user หรือไม่
 export async function getAuthContext(): Promise<AuthContext | null> {
-  const h = await headers()
-  const userId = h.get("x-facein-user-id")
-  if (!userId) return null
-
-  return {
-    userId,
-    teamId: h.get("x-facein-team-id"),
-    email: h.get("x-facein-user-email"),
-  }
+  const user = await stackServerApp.getUser().catch(() => null)
+  if (!user) return null
+  return { userId: user.id, teamId: user.selectedTeam?.id ?? null }
 }
 
-/** Strict version — throw ถ้าไม่มี user */
+// ใช้สำหรับ server action หรือ API ที่ต้อง enforce login
 export async function requireAuthContext(): Promise<AuthContext> {
   const ctx = await getAuthContext()
-  if (!ctx?.userId) {
-    throw new AppError("UNAUTHORIZED", "User is not authenticated")
-  }
+  if (!ctx) throw new AppError("UNAUTHORIZED", "User is not authenticated")
   return ctx
 }
