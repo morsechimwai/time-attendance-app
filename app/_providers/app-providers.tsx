@@ -1,3 +1,8 @@
+"use client"
+
+import { StackProvider, StackTheme } from "@stackframe/stack"
+import { stackClientApp } from "@/stack/client"
+import { ThemeProvider } from "@/components/theme-provider"
 import { SidebarProvider } from "@/components/ui/sidebar"
 
 export default function AppProviders({
@@ -5,5 +10,13 @@ export default function AppProviders({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <SidebarProvider>{children}</SidebarProvider>
+  return (
+    <StackProvider app={stackClientApp}>
+      <StackTheme>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <SidebarProvider>{children}</SidebarProvider>
+        </ThemeProvider>
+      </StackTheme>
+    </StackProvider>
+  )
 }
