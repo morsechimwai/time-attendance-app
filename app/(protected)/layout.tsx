@@ -2,8 +2,8 @@
 import { Metadata } from "next"
 
 // Components
-import AppSidebar from "@/components/app-sidebar"
-import SiteHeader from "@/components/site-header"
+import AppSidebar from "@/app/(protected)/_components/app-sidebar"
+import AppNavbar from "@/app/(protected)/_components/app-navbar"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://face.in"),
@@ -25,12 +25,12 @@ export default async function ProtectedLayout({
   const teamId = Array.isArray(paramTeamId) ? paramTeamId[0] : paramTeamId
 
   return (
-    <>
+    <div className="flex min-h-svh w-full bg-muted/40">
       <AppSidebar teamId={teamId} />
-      <main className="w-full min-h-screen">
-        <SiteHeader />
-        {children}
-      </main>
-    </>
+      <div className="flex flex-1 flex-col">
+        <AppNavbar />
+        <section className="flex-1 overflow-auto">{children}</section>
+      </div>
+    </div>
   )
 }
