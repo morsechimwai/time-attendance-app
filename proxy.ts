@@ -85,19 +85,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Redirect authenticated users hitting the home page to their team dashboard
-  if (pathname === "/") {
-    const user = await resolveUser(request)
-
-    const selectedTeam = user?.selectedTeam
-    if (selectedTeam?.id) {
-      const redirectUrl = new URL(`/team/${selectedTeam.id}/dashboard/`, request.url)
-      return NextResponse.redirect(redirectUrl)
-    }
-
-    return NextResponse.next()
-  }
-
   // Skip public routes or anything not marked as protected
   if (isPublic(pathname) || !isProtected(pathname)) {
     return NextResponse.next()
