@@ -20,6 +20,7 @@ import { UserButton } from "@stackframe/stack"
 import { useTheme } from "next-themes"
 import { useCallback } from "react"
 import { CircleQuestionMark, House } from "lucide-react"
+import LegalDropdown from "@/app/legal/_components/legal-dropdown"
 
 export default function AppNavbar() {
   // Get current pathname
@@ -66,9 +67,7 @@ export default function AppNavbar() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="ml-auto flex items-center gap-1 lg:gap-2 font-sans">
-          <Button variant="ghost" size="sm">
-            <CircleQuestionMark />
-          </Button>
+          <LegalDropdown />
           <div className="p-2 mt-2">
             <UserButton
               colorModeToggle={handleThemeToggle}
