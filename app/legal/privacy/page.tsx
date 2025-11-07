@@ -1,68 +1,268 @@
+// app/legal/privacy/page.tsx
+import { type ReactNode } from "react"
+
+import { ThaiDateTime } from "@/lib/utils/formatters/thai-datetime"
+import { SquarePen } from "lucide-react"
+
+const Section = ({ title, children }: { title: string; children: ReactNode }) => (
+  <section className="rounded-xl border border-primary bg-primary p-6 shadow-sm backdrop-blur">
+    <h2 className="text-xl font-semibold text-primary-foreground">{title}</h2>
+    <div className="mt-3 space-y-3 text-primary-foreground">{children}</div>
+  </section>
+)
+
 export default function PrivacyPage() {
+  const lastUpdated = ThaiDateTime.format(new Date(), "dateShort")
+  const legalMeta = [
+    { label: "ฐานทางกฎหมายหลัก", value: "PDPA พ.ศ. 2562 และประกาศที่เกี่ยวข้อง" },
+    { label: "ข้อมูลสำคัญ", value: "ข้อมูลชีวภาพ, ภาพถ่าย, บันทึกความปลอดภัย" },
+    { label: "DPO / ช่องทาง", value: `${process.env.NEXT_PUBLIC_EMAIL_DPO}` },
+    { label: "อัปเดต", value: lastUpdated },
+  ]
+  const highlights = [
+    "ควบคุมการใช้ข้อมูลภาพและ AI อย่างโปร่งใส",
+    "เก็บข้อมูลชีวภาพแบบเข้ารหัสและมีสิทธิถอนยินยอมตลอดเวลา",
+    "รองรับการโอนข้อมูลตามมาตรา 28 พร้อม DPA กับผู้ประมวลผล",
+  ]
+
   return (
-    <div className="max-w-3xl mx-auto py-12 space-y-6">
-      <h1 className="text-3xl font-bold">Privacy Policy</h1>
-      <p>
-        We are committed to protecting your personal information and complying with applicable data
-        protection laws, including PDPA and GDPR where relevant.
-      </p>
+    <div className="w-full bg-gradient from-primary/50 via-primary/80 to-primary py-12 sm:py-16">
+      <div className="mx-auto flex max-w-4xl flex-col gap-8 px-6">
+        <div className="rounded-3xl border border-primary bg-primary p-8 shadow-xl backdrop-blur">
+          <div className="flex flex-wrap items-center gap-4">
+            <h2 className="text-5xl font-black tracking-tight text-primary-foreground">FaceIN</h2>
+            <span className="rounded-full bg-primary-foreground/5 px-4 py-1 text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
+              Privacy
+            </span>
+          </div>
+          <h1 className="mt-6 text-3xl font-bold text-primary-foreground">
+            นโยบายความเป็นส่วนตัว (Privacy Policy)
+          </h1>
+          <p className="mt-4 text-base leading-7 text-primary-foreground">
+            เอกสารนี้อธิบายวิธีที่ FaceIN (“บริการ”) เก็บ ใช้ เปิดเผย และปกป้องข้อมูลส่วนบุคคล
+            รวมถึงข้อมูลภาพและข้อมูลชีวภาพ โดยปฏิบัติตาม PDPA และกฎหมายไทยที่เกี่ยวข้อง
+            เราเป็นผู้ควบคุมข้อมูลและอาจแต่งตั้งผู้ประมวลผลเมื่อจำเป็น
+          </p>
+          <div className="mt-6 grid gap-4 text-sm text-primary-foreground sm:grid-cols-2">
+            {legalMeta.map((meta) => (
+              <div
+                key={meta.label}
+                className="rounded-xl border border-primary-foreground/5 bg-primary p-4 shadow-sm"
+              >
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground">
+                  {meta.label}
+                </div>
+                <div className="mt-1 text-base font-semibold text-primary-foreground">
+                  {meta.value}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {highlights.map((item) => (
+              <span
+                key={item}
+                className="rounded-full bg-primary-foreground/5 px-4 py-1.5 text-xs font-medium text-primary-foreground/80 tracking-[0.12em]"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
 
-      <h2 className="text-xl font-semibold">1. Information We Collect</h2>
-      <ul className="list-disc pl-6 space-y-1">
-        <li>Account information (name, email, password hashed securely)</li>
-        <li>Usage and device information</li>
-        <li>
-          <strong>Biometric face data (when enabled)</strong> — stored as encrypted templates, not
-          raw images, when possible
-        </li>
-      </ul>
+        <div className="space-y-6">
+          <Section title="1. ประเภทข้อมูลที่เก็บรวบรวม">
+            <p>
+              เรารวบรวมเฉพาะข้อมูลที่จำเป็นต่อการให้บริการพิสูจน์ตัวตนและการบันทึกเวลา
+              โดยแบ่งออกเป็น:
+            </p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>ข้อมูลบัญชี: ชื่อ-นามสกุล อีเมล เบอร์โทรศัพท์ หน่วยงาน และบทบาทผู้ใช้</li>
+              <li>
+                ข้อมูลยืนยันตัวตน: รหัสผ่านที่เข้ารหัส โทเคน การยืนยันหลายปัจจัย
+                และบันทึกการเข้าสู่ระบบ
+              </li>
+              <li>
+                ข้อมูลการใช้งาน: การตั้งค่า อุปกรณ์ที่เข้าถึง พฤติกรรมการใช้
+                และข้อมูลวิเคราะห์ประสิทธิภาพ
+              </li>
+              <li>ข้อมูลการสนับสนุน: แบบฟอร์มติดต่อ บันทึกการสนทนา และเอกสารที่ผู้ใช้ส่งมา</li>
+              <li>
+                <strong>ข้อมูลชีวภาพใบหน้า</strong> (Biometric Template) เมื่อผู้ใช้ยินยอม
+                โดยจัดเก็บในรูปแบบค่าที่เข้ารหัส และแยกจากฐานข้อมูลหลัก
+              </li>
+              <li>
+                ข้อมูลภาพหรือวิดีโอที่ผู้ใช้ส่งเพื่อยืนยันตัวตน รวมถึงเมตาดาตา (เช่น เฟรมที่ตัดแล้ว
+                Landmark, Embedding, และคะแนนความมั่นใจของโมเดล)
+                ซึ่งจะถูกจำกัดการเข้าถึงอย่างเคร่งครัด
+              </li>
+            </ul>
+          </Section>
 
-      <h2 className="text-xl font-semibold">2. Purpose of Processing</h2>
-      <p>We use data to:</p>
-      <ul className="list-disc pl-6 space-y-1">
-        <li>Provide secure sign-in and identity verification</li>
-        <li>Maintain account access and security</li>
-        <li>Improve service performance and user experience</li>
-      </ul>
-      <p>
-        Biometric data is used <strong>only</strong> for authentication and security — never for
-        advertising, profiling, or facial recognition outside the system.
-      </p>
+          <Section title="2. วัตถุประสงค์และฐานทางกฎหมาย">
+            <p>เราประมวลผลข้อมูลภายใต้ฐานกฎหมายตาม PDPA ดังนี้:</p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>ความยินยอมอย่างชัดแจ้งสำหรับข้อมูลชีวภาพ การสื่อสารการตลาด หรือฟีเจอร์ทดลอง</li>
+              <li>
+                การปฏิบัติตามสัญญา เพื่อสร้างบัญชี ให้สิทธิ์การเข้าถึง ตรวจสอบการเข้า-ออก
+                และสนับสนุนผู้ใช้
+              </li>
+              <li>
+                ประโยชน์โดยชอบด้วยกฎหมาย เพื่อความปลอดภัย ป้องกันการทุจริต วิเคราะห์ประสิทธิภาพ
+                และพัฒนาฟีเจอร์ใหม่
+              </li>
+              <li>
+                การปฏิบัติตามกฎหมายหรือคำสั่งของหน่วยงานรัฐ/ศาล
+                รวมถึงข้อกำหนดแรงงานและความมั่นคงไซเบอร์
+              </li>
+              <li>
+                การปกป้องชีวิตหรือความปลอดภัย เมื่อจำเป็นต้องพิสูจน์ตัวบุคคลในสถานการณ์ฉุกเฉิน
+              </li>
+            </ul>
+          </Section>
 
-      <h2 className="text-xl font-semibold">3. Data Security</h2>
-      <p>
-        We use encryption, secure storage, and access controls to protect your data. Biometric
-        templates are protected with industry-standard security measures.
-      </p>
+          <Section title="3. การใช้ เปิดเผย และผู้ประมวลผลข้อมูล">
+            <p>
+              เราใช้ข้อมูลเพื่อพิสูจน์ตัวตน จัดการบัญชี ตรวจจับความผิดปกติ ปรับปรุงผลิตภัณฑ์
+              และให้การสนับสนุน การเปิดเผยต่อบุคคลที่สามจะทำเฉพาะเมื่อ:
+            </p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>
+                จำเป็นต้องใช้ผู้ประมวลผล เช่น โครงสร้างพื้นฐานคลาวด์ ระบบพิสูจน์ตัวตน
+                หรือที่ปรึกษาด้านกฎหมาย/ความปลอดภัย
+              </li>
+              <li>
+                ผู้ใช้ร้องขอให้เชื่อมต่อกับระบบ HR, Payroll หรือ ERP ภายนอก
+                โดยมีสัญญาประมวลผลข้อมูลกำกับ
+              </li>
+              <li>เรามีหน้าที่ตามกฎหมาย ต้องรายงานต่อหน่วยงานกำกับดูแล หรือดำเนินตามคำสั่งศาล</li>
+              <li>
+                ใช้ข้อมูลที่ทำให้เป็นนิรนามสำหรับการวิเคราะห์แนวโน้ม คุณภาพบริการ
+                และการทดสอบความเอนเอียงของ AI
+              </li>
+            </ul>
+          </Section>
 
-      <h2 className="text-xl font-semibold">4. Data Sharing</h2>
-      <p>
-        We do not sell personal data. Data may be shared only with trusted service providers
-        necessary for system operation (e.g., secure cloud hosting) or when legally required.
-      </p>
+          <Section title="4. การโอนข้อมูลระหว่างประเทศ">
+            <p>
+              ศูนย์ข้อมูลหลักตั้งอยู่ในประเทศไทย
+              แต่เราอาจโอนข้อมูลไปยังผู้ประมวลผลในต่างประเทศเมื่อจำเป็น โดยจะดำเนินการตามมาตรา 28
+              ของ PDPA และมาตรการถ่ายโอนที่ยอมรับในระดับสากล
+            </p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>
+                ประเมินมาตรฐานการคุ้มครองของประเทศปลายทาง และเลือกเฉพาะผู้ให้บริการที่มีการรับรอง
+              </li>
+              <li>ทำข้อตกลงมาตรฐาน (Standard Contractual Clauses) หรือกลไกที่หน่วยงานไทยรับรอง</li>
+              <li>
+                แจ้งผู้ใช้หากมีการโอนข้อมูลที่มีความเสี่ยงสูง และจัดทำบันทึกการโอนเพื่อการตรวจสอบ
+              </li>
+            </ul>
+          </Section>
 
-      <h2 className="text-xl font-semibold">5. Data Retention</h2>
-      <p>
-        Data is retained as long as your account remains active. Upon account deletion request, data
-        will be erased within a reasonable period unless legal obligations require retention.
-      </p>
+          <Section title="5. มาตรการรักษาความปลอดภัย">
+            <p>
+              ระบบใช้การเข้ารหัสระหว่างส่งและจัดเก็บ การแบ่งแยกสภาพแวดล้อมข้อมูล
+              การควบคุมสิทธิ์ตามบทบาท (RBAC) การจัดการกุญแจเข้ารหัส การตรวจสอบ log แบบเรียลไทม์
+              และการทดสอบความปลอดภัยเป็นประจำ
+            </p>
+            <p>
+              เทมเพลตข้อมูลใบหน้าและเมตาดาตา AI
+              ถูกเก็บในโครงสร้างที่แยกจากฐานข้อมูลธุรกรรมเพื่อลดผลกระทบหากเกิดเหตุไม่คาดคิด
+              และมีการตรวจสอบสิทธิ์พิเศษ (Privileged Access Management) สำหรับทีมปฏิบัติการ
+            </p>
+          </Section>
 
-      <h2 className="text-xl font-semibold">6. Your Rights</h2>
-      <p>You may:</p>
-      <ul className="list-disc pl-6 space-y-1">
-        <li>Request access to your data</li>
-        <li>Request correction or deletion</li>
-        <li>Withdraw consent for biometric processing</li>
-        <li>Export your data</li>
-      </ul>
+          <Section title="6. ระยะเวลาการเก็บรักษา">
+            <p>
+              เราเก็บข้อมูลเท่าที่จำเป็นต่อวัตถุประสงค์ทางธุรกิจหรือข้อกฎหมาย
+              และทำให้เป็นนิรนามเมื่อหมดความจำเป็น สำหรับข้อมูลสำคัญ:
+            </p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>
+                ข้อมูลชีวภาพ: ทำลายหรือทำให้เป็นนิรนามภายใน 60 วันหลังถอนความยินยอมหรือสิ้นสุดสัญญา
+              </li>
+              <li>
+                ภาพหรือวิดีโอที่ใช้ยืนยันตัวตน: เก็บในที่จัดเก็บชั่วคราวไม่เกิน 30 วัน
+                ยกเว้นต้องเก็บตามกฎหมายแรงงาน
+              </li>
+              <li>บันทึกระบบและความปลอดภัย: เก็บ 12 เดือนหรือยาวกว่าหากจำเป็นต่อการตรวจสอบ</li>
+              <li>ข้อมูลสำรอง: ลบออกระหว่างรอบการสำรองไม่เกิน 90 วันหลังคำขอ</li>
+            </ul>
+          </Section>
 
-      <h2 className="text-xl font-semibold">7. Contact</h2>
-      <p>
-        For privacy inquiries or data removal requests, contact us at:{" "}
-        <strong>support@example.com</strong>
-      </p>
+          <Section title="7. สิทธิของเจ้าของข้อมูล">
+            <p>ผู้ใช้สามารถยื่นคำร้องเพื่อ:</p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>ขอรับสำเนาหรือเข้าถึงข้อมูลส่วนบุคคลของตน และรับทราบแหล่งที่มาของข้อมูลภาพ</li>
+              <li>ขอแก้ไขให้ถูกต้อง เป็นปัจจุบัน และครบถ้วน</li>
+              <li>คัดค้านหรือจำกัดการประมวลผลบางประเภท เช่น การใช้เพื่อการทดสอบ AI เพิ่มเติม</li>
+              <li>ถอนความยินยอมโดยไม่กระทบความชอบด้วยกฎหมายก่อนหน้าการถอน</li>
+              <li>ขอให้ลบ ทำลาย หรือทำให้ข้อมูลเป็นนิรนามเมื่อไม่มีความจำเป็นต้องประมวลผลแล้ว</li>
+              <li>ร้องเรียนต่อสำนักงานคณะกรรมการคุ้มครองข้อมูลส่วนบุคคลหากเห็นว่าถูกละเมิดสิทธิ</li>
+              <li>ขอคำอธิบายเกี่ยวกับตรรกะของการตัดสินใจอัตโนมัติที่มีผลต่อสิทธิของตน</li>
+            </ul>
+          </Section>
 
-      <p>Last updated: {new Date().toLocaleDateString()}</p>
+          <Section title="8. การตัดสินใจอัตโนมัติและ AI">
+            <p>
+              FaceIN ใช้โมเดล AI เพื่อประเมินความตรงกันของใบหน้าและแจ้งเตือนความผิดปกติ
+              แต่จะไม่ใช้ผลลัพธ์เพียงอย่างเดียว
+              ในการตัดสินใจที่มีผลกระทบทางกฎหมายหรือสาระสำคัญโดยไม่มีมนุษย์กำกับ
+            </p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>เราบันทึกค่า Confidence Score และให้ผู้ใช้ปลายทางเข้าถึงเพื่อประกอบการพิจารณา</li>
+              <li>
+                มีการประเมินความเอนเอียงของโมเดลเป็นประจำ พร้อมเก็บหลักฐานเพื่อตรวจสอบย้อนกลับ
+              </li>
+              <li>
+                ผู้ใช้สามารถขอให้มีการทบทวนโดยเจ้าหน้าที่ หากไม่เห็นด้วยกับผลการประมวลผลของ AI
+              </li>
+              <li>
+                เราจะไม่ใช้ข้อมูลภาพเพื่อฝึกโมเดลภายนอกหรือจำหน่ายต่อ โดยไม่มีความยินยอมที่ชัดแจ้ง
+              </li>
+            </ul>
+          </Section>
+
+          <Section title="9. การจัดการข้อมูลชีวภาพและรูปภาพ">
+            <p>
+              ฟังก์ชันจดจำใบหน้าจะทำงานได้เมื่อเจ้าของข้อมูลให้ความยินยอม
+              และสามารถปิดใช้งานได้ทุกเมื่อผ่านทีมดูแลลูกค้า
+              เราบันทึกหลักฐานการยินยอมและปลายทางการแชร์ข้อมูลภาพเพื่อรองรับการตรวจสอบ
+            </p>
+            <p>
+              การขอลบข้อมูลชีวภาพต้องผ่านขั้นตอนยืนยันตัวตนเพิ่มเติมและระบบจะส่งหลักฐานการลบให้ภายในระยะเวลาที่กำหนด
+              พร้อมป้องกันคำร้องโดยมิชอบด้วยการตรวจสอบหลายชั้น
+            </p>
+          </Section>
+
+          <Section title="10. ช่องทางติดต่อและการแจ้งเหตุ">
+            <p>
+              หากต้องการใช้สิทธิ แจ้งเหตุละเมิดข้อมูล หรือสอบถามเพิ่มเติม โปรดติดต่อ{" "}
+              <strong>support@example.com</strong> (ระบุหัวข้อ “PDPA / Privacy”)
+              เจ้าหน้าที่คุ้มครองข้อมูล (DPO) จะตอบกลับภายใน 15 วันทำการ
+            </p>
+            <p>
+              ในกรณีพบเหตุละเมิดที่มีความเสี่ยงสูง
+              โปรดแจ้งรายละเอียดทันทีเพื่อให้เราสามารถประสานหน่วยงานกำกับและผู้มีส่วนได้เสีย ภายใน
+              72 ชั่วโมงหรือตามที่กฎหมายกำหนด
+            </p>
+          </Section>
+
+          <Section title="11. การปรับปรุงนโยบาย">
+            <p>
+              เราอาจปรับปรุงนโยบายนี้เพื่อสะท้อนการให้บริการหรือข้อกำหนดทางกฎหมาย
+              หากมีการเปลี่ยนแปลงสาระสำคัญ จะประกาศให้ทราบล่วงหน้า
+              และการใช้งานต่อเนื่องถือว่าผู้ใช้ยอมรับการแก้ไขแล้ว
+            </p>
+          </Section>
+
+          <div className="flex gap-2 items-center justify-center">
+            <SquarePen className="text-primary size-4" />
+            <p className="text-sm text-primary">ปรับปรุงล่าสุด: {lastUpdated}</p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

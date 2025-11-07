@@ -1,62 +1,278 @@
+// app/legal/terms/page.tsx
+import { type ReactNode } from "react"
+
+import ThaiDateTime from "@/lib/utils/formatters/thai-datetime"
+import { SquarePen } from "lucide-react"
+
+const Section = ({ title, children }: { title: string; children: ReactNode }) => (
+  <section className="rounded-xl border border-primary bg-primary p-6 shadow-sm backdrop-blur">
+    <h2 className="text-xl font-semibold text-primary-foreground">{title}</h2>
+    <div className="mt-3 space-y-3 text-primary-foreground">{children}</div>
+  </section>
+)
+
 export default function TermsPage() {
+  const lastUpdated = ThaiDateTime.format(new Date(), "dateShort")
+  const legalMeta = [
+    { label: "ขอบเขตบริการ", value: "FaceIN SaaS / API สำหรับยืนยันตัวตนและบันทึกเวลา" },
+    { label: "กฎหมายอ้างอิง", value: "PDPA, ป.พ.พ., พ.ร.บ.ว่าด้วยการกระทำความผิดฯ" },
+    { label: "ข้อมูลที่ครอบคลุม", value: "ข้อมูลชีวภาพใบหน้า, ภาพถ่าย, บันทึกกิจกรรม" },
+    { label: "อัปเดต", value: lastUpdated },
+  ]
+  const highlights = [
+    "ออกแบบตามแนวทาง PDPA สำหรับข้อมูลชีวภาพ",
+    "ควบคุมโมเดล AI และข้อมูลภาพได้อย่างโปร่งใส",
+    "มีแผนแจ้งเหตุละเมิดภายในกรอบกฎหมายไทย",
+  ]
+
   return (
-    <div className="max-w-3xl mx-auto py-12 space-y-6">
-      <h1 className="text-3xl font-bold">Terms of Service</h1>
-      <p>
-        By accessing or using this service, you agree to be bound by the following terms. If you do
-        not agree, you may not use the service.
-      </p>
+    <div className="w-full bg-gradient from-primary/50 via-primary/80 to-primary py-12 sm:py-16">
+      <div className="mx-auto w-full flex max-w-4xl flex-col gap-8 px-6">
+        <div className="rounded-3xl border border-primary bg-primary p-8 shadow-xl backdrop-blur">
+          <div className="flex flex-wrap items-center gap-4">
+            <h2 className="text-5xl font-black tracking-tight text-primary-foreground">FaceIN</h2>
+            <span className="rounded-full bg-primary-foreground/5 px-4 py-1 text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
+              Legal Center
+            </span>
+          </div>
+          <h1 className="mt-6 text-3xl font-bold text-primary-foreground">
+            ข้อตกลงการใช้บริการ (Terms of Service)
+          </h1>
+          <p className="mt-4 text-base leading-7 text-primary-foreground">
+            การเข้าถึงหรือใช้ FaceIN (“บริการ”)
+            ถือว่าผู้ใช้ตกลงปฏิบัติตามเงื่อนไขที่มุ่งปกป้องข้อมูลส่วนบุคคล
+            โดยเฉพาะข้อมูลชีวภาพและข้อมูลภาพที่เกี่ยวข้องกับ AI ตามกฎหมายไทย หากไม่ยอมรับ
+            โปรดหยุดใช้งานทันที
+          </p>
+          <div className="mt-6 grid gap-4 text-sm text-primary-foreground sm:grid-cols-2">
+            {legalMeta.map((meta) => (
+              <div
+                key={meta.label}
+                className="rounded-xl border border-primary-foreground/5 bg-primary p-4 shadow-sm"
+              >
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground">
+                  {meta.label}
+                </div>
+                <div className="mt-1 text-base font-semibold text-primary-foreground">
+                  {meta.value}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {highlights.map((item) => (
+              <span
+                key={item}
+                className="rounded-full bg-primary-foreground/5 px-4 py-1.5 text-xs font-medium text-primary-foreground/80 tracking-[0.12em]"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
 
-      <h2 className="text-xl font-semibold">1. Use of Service</h2>
-      <p>
-        You agree to use the service legally and responsibly. You must not engage in actions that
-        disrupt, damage, or compromise the system or other users.
-      </p>
+        <div className="space-y-6">
+          <Section title="1. คู่สัญญาและขอบเขต">
+            <p>
+              เงื่อนไขนี้กำกับความสัมพันธ์ระหว่างผู้ให้บริการ FaceIN ในฐานะผู้ควบคุมระบบ
+              กับผู้ใช้หรือองค์กรที่ได้รับสิทธิ์ ครอบคลุมทั้งแอป เวอร์ชันเว็บ API
+              และส่วนเชื่อมต่อที่ใช้โมเดล AI
+              ผู้ลงทะเบียนต้องมีอำนาจตามกฎหมายและรับผิดชอบสมาชิกภายใต้บัญชีเดียวกัน
+            </p>
+            <p>
+              การใช้งานต่อเนื่องถือเป็นการยอมรับข้อกำหนดทั้งหมด รวมถึงนโยบายเฉพาะด้านข้อมูลชีวภาพ
+              การป้องกัน AI Bias และเอกสารแนบท้ายตามสัญญา
+            </p>
+          </Section>
 
-      <h2 className="text-xl font-semibold">2. User Content & Ownership</h2>
-      <p>
-        You retain ownership of the content you upload. By using this service, you grant us
-        permission to process and store your content solely to operate and improve the service.
-      </p>
+          <Section title="2. บัญชีและความถูกต้องของข้อมูล">
+            <p>
+              ผู้ใช้ต้องให้ข้อมูลที่ถูกต้อง เป็นปัจจุบัน และรักษาความลับของข้อมูลเข้าสู่ระบบ
+              หากพบการใช้งานโดยไม่ได้รับอนุญาตต้องแจ้งเราภายใน 24 ชั่วโมง
+              ผู้ใช้รับผิดชอบกิจกรรมทั้งหมดภายใต้บัญชีของตนและต้องใช้กลไกยืนยันตัวตนที่เราแนะนำ
+              (เช่น MFA)
+            </p>
+            <p>
+              เราขอสงวนสิทธิ์ระงับบัญชีที่ให้ข้อมูลเท็จ ปกปิดวัตถุประสงค์
+              หรือฝ่าฝืนข้อกำหนดของหน่วยงานกำกับดูแลไทย เช่น
+              สำนักงานคณะกรรมการคุ้มครองข้อมูลส่วนบุคคล (สคส.).
+            </p>
+          </Section>
 
-      <h2 className="text-xl font-semibold">3. Biometric Data</h2>
-      <p>
-        If biometric facial data is collected, it is used exclusively for secure identity
-        verification and access control. We do not sell or share biometric data for marketing or
-        unrelated purposes.
-      </p>
+          <Section title="3. การใช้งานที่อนุญาต">
+            <ul className="list-disc space-y-2 pl-6">
+              <li>
+                ใช้บริการตามวัตถุประสงค์ที่ระบุและสอดคล้องกับกฎหมายไทย รวมถึง PDPA กฎหมายแรงงาน
+                และกฎหมายความมั่นคงไซเบอร์
+              </li>
+              <li>
+                งดเว้นการเข้าถึงระบบโดยมิชอบ ทำวิศวกรรมย้อนกลับ สแกนช่องโหว่
+                หรือสร้างภาระเกินสมควรแก่ระบบ
+              </li>
+              <li>
+                ไม่อัปโหลดเนื้อหาที่ผิดกฎหมาย ละเมิดสิทธิผู้อื่น มีมัลแวร์
+                หรือข้อมูลภาพที่ได้มาโดยไม่ได้รับความยินยอม
+              </li>
+              <li>
+                ปฏิบัติตามข้อกำหนดควบคุมการส่งออกเทคโนโลยีและข้อจำกัดของหน่วยงานรัฐเมื่อมีการถ่ายโอน
+                AI Model หรือข้อมูลฝึกสอน
+              </li>
+            </ul>
+          </Section>
 
-      <h2 className="text-xl font-semibold">4. Service Availability</h2>
-      <p>
-        We aim to provide stable service, but availability may be interrupted for maintenance or
-        unforeseen issues. We reserve the right to modify or discontinue the service.
-      </p>
+          <Section title="4. ข้อมูลผู้ใช้และความเป็นเจ้าของ">
+            <p>
+              ผู้ใช้ยังคงเป็นเจ้าของข้อมูลและเนื้อหาของตน แต่ให้สิทธิ์แก่เราในการประมวลผล จัดเก็บ
+              และสำรองข้อมูลตามที่จำเป็น เพื่อให้บริการและปรับปรุงระบบ
+              การประมวลผลทั้งหมดอยู่ภายใต้นโยบายความเป็นส่วนตัวและ PDPA
+            </p>
+            <p>
+              เราจะไม่ใช้ข้อมูลที่ระบุตัวบุคคลได้เพื่อฝึกโมเดลใหม่โดยไม่ได้รับความยินยอม
+              โดยมุ่งใช้ข้อมูลที่นิรนามหรือสถิติสำหรับการพัฒนาประสิทธิภาพเท่านั้น
+            </p>
+          </Section>
 
-      <h2 className="text-xl font-semibold">5. Fees & Billing</h2>
-      <p>
-        Some features may require a paid subscription. Cancellations and refunds follow our billing
-        policy as described in your subscription plan.
-      </p>
+          <Section title="5. ข้อมูลชีวภาพและความยินยอม">
+            <p>
+              ข้อมูลชีวภาพจากใบหน้าเป็นข้อมูลอ่อนไหวตาม PDPA มาตรา 26 เราจะขอความยินยอมที่ชัดแจ้ง
+              พร้อมอธิบายวัตถุประสงค์ การเก็บรักษา และสิทธิในการถอนความยินยอมทุกเมื่อ
+            </p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>
+                FaceIN เก็บเทมเพลตที่เข้ารหัสแยกจากข้อมูลประจำตัว
+                และใช้อัลกอริทึมหรือมาตรการที่ได้รับรองตามแนวทางของ สคส.
+              </li>
+              <li>
+                เราลบหรือทำให้ข้อมูลเป็นนิรนามภายใน 30 วันหลังได้รับคำร้องที่ผ่านการยืนยันตัวตน
+              </li>
+              <li>
+                ผู้ใช้ต้องรับผิดชอบในการแจ้งพนักงาน/ผู้รับบริการให้ทราบถึงการบันทึกภาพและขอความยินยอมตามแบบฟอร์มที่กฎหมายกำหนด
+              </li>
+            </ul>
+          </Section>
 
-      <h2 className="text-xl font-semibold">6. Termination</h2>
-      <p>
-        We may suspend or terminate your account for violations of these terms. You may request
-        account deletion at any time.
-      </p>
+          <Section title="6. การใช้ AI และการประมวลผลข้อมูลภาพ">
+            <p>
+              FaceIN ใช้โมเดลการเรียนรู้เชิงลึกเพื่อจับคู่ใบหน้าและระบุความผิดปกติ
+              โดยปฏิบัติตามแนวทางกำกับดูแลของไทย และหลักการโปร่งใสด้าน AI
+              ที่สำนักงานพัฒนาธุรกรรมทางอิเล็กทรอนิกส์ (ETDA) แนะนำ
+            </p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>
+                ไม่ใช้ภาพหรือข้อมูลที่ระบุตัวบุคคลได้เพื่อฝึกโมเดลเพิ่มเติม
+                เว้นแต่ได้รับความยินยอมและผ่านการทำให้เป็นนิรนามหรือรวมศูนย์
+              </li>
+              <li>
+                ผู้ใช้รับรองว่าข้อมูลภาพที่อัปโหลดมาจากแหล่งที่ชอบด้วยกฎหมาย
+                และได้รับสิทธิ์ในการแชร์กับ FaceIN
+              </li>
+              <li>
+                ผลลัพธ์และคะแนนความมั่นใจของ AI มีไว้เพื่อช่วยตัดสินใจ
+                ผู้ใช้ยังคงเป็นผู้รับผิดชอบผลลัพธ์ทางธุรกิจ
+              </li>
+              <li>
+                ห้ามใช้บริการเพื่อเฝ้าระวังบุคคลทั่วไปหรือประมวลผลข้อมูลของผู้เยาว์โดยไม่ได้รับอนุญาตตามที่กฎหมายกำหนด
+              </li>
+            </ul>
+          </Section>
 
-      <h2 className="text-xl font-semibold">7. Limitation of Liability</h2>
-      <p>
-        This service is provided &quot;as is&quot;. We are not liable for damages caused by service
-        interruptions, data loss, or unauthorized access outside our reasonable control.
-      </p>
+          <Section title="7. ค่าบริการและการชำระเงิน">
+            <p>
+              ฟีเจอร์บางประเภทอาจมีค่าบริการหรือการสมัครสมาชิก ผู้ใช้ยอมรับอัตรา วิธีคิดค่าบริการ
+              รอบบิล และค่าปรับที่แจ้งไว้ การคืนเงินเป็นไปตามนโยบายของแผนบริการ
+              หากไม่ชำระค่าบริการครบถ้วน เราอาจจำกัดฟังก์ชัน ระงับ API หรือปิดบัญชี
+            </p>
+          </Section>
 
-      <h2 className="text-xl font-semibold">8. Updates to Terms</h2>
-      <p>
-        We may update these terms periodically. Continued use after changes indicates acceptance of
-        the updated terms.
-      </p>
+          <Section title="8. ความพร้อมและการบำรุงรักษา">
+            <p>
+              เรามุ่งให้บริการมีเสถียรภาพ แต่ไม่รับประกันว่าจะไม่มีเหตุขัดข้อง การบำรุงรักษา อัปเกรด
+              หรือเหตุสุดวิสัยอาจทำให้บริการล่าช้าหรือหยุดชั่วคราวได้
+              และเราจะแจ้งให้ทราบล่วงหน้าเมื่อทำได้
+            </p>
+          </Section>
 
-      <p>Last updated: {new Date().toLocaleDateString()}</p>
+          <Section title="9. การจำกัดความรับผิด">
+            <p>
+              บริการนี้ให้ในสภาพ “ตามที่เป็น” โดยจำกัดความรับผิดในขอบเขตสูงสุดที่กฎหมายไทยอนุญาต
+              เราไม่รับผิดชอบต่อความเสียหายทางอ้อม การสูญเสียกำไร หรือข้อมูล เว้นแต่เกิดจากการจงใจ
+              หรือประมาทเลินเล่ออย่างร้ายแรงของเรา
+            </p>
+          </Section>
+
+          <Section title="10. ทรัพย์สินทางปัญญา">
+            <p>
+              ซอฟต์แวร์ โมเดล AI เครื่องหมายการค้า
+              และสื่อประกอบบริการเป็นทรัพย์สินของผู้ให้บริการหรือผู้อนุญาต
+              ผู้ใช้ได้รับสิทธิ์ใช้งานแบบไม่ผูกขาดและเพิกถอนได้ ไม่อนุญาตให้ทำซ้ำ ดัดแปลง
+              หรือเผยแพร่ นอกเหนือสิทธิ์ที่ระบุ
+            </p>
+          </Section>
+
+          <Section title="11. การระงับและการยุติ">
+            <p>
+              เราอาจระงับหรือยุติบริการเมื่อผู้ใช้ฝ่าฝืนเงื่อนไข กฎหมาย
+              หรือสร้างความเสี่ยงด้านความปลอดภัย ผู้ใช้สามารถแจ้งปิดบัญชีและขอลบข้อมูลได้
+              แต่ค่าบริการที่ชำระแล้วไม่สามารถคืนได้เมื่อยุติเพราะฝ่าฝืน
+            </p>
+          </Section>
+
+          <Section title="12. การโอนข้อมูลและผู้ประมวลผลย่อย">
+            <p>
+              FaceIN อาจใช้ผู้ประมวลผลย่อยที่อยู่ในไทยหรือประเทศที่มีมาตรฐานคุ้มครองข้อมูลเพียงพอ
+              โดยทำข้อตกลงประมวลผลข้อมูล (DPA) ที่ครอบคลุมหน้าที่ตาม PDPA
+            </p>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>
+                การโอนข้อมูลไปต่างประเทศทำได้เมื่อได้รับความยินยอม หรือมีมาตรการป้องกันที่ PDPA
+                มาตรา 28 กำหนด
+              </li>
+              <li>
+                เราจะเปิดเผยรายชื่อผู้ประมวลผลย่อยหลักและกลไกการคุ้มครองผ่านศูนย์ช่วยเหลือลูกค้า
+              </li>
+            </ul>
+          </Section>
+
+          <Section title="13. การแจ้งเหตุละเมิดข้อมูล">
+            <p>
+              หากพบเหตุละเมิดข้อมูลส่วนบุคคล
+              เราจะแจ้งสำนักงานคณะกรรมการคุ้มครองข้อมูลส่วนบุคคลและผู้มีส่วนได้เสียโดยไม่ชักช้า
+              ภายใน 72 ชั่วโมงหรือเร็วที่สุดตามที่กฎหมายกำหนด พร้อมระบุมาตรการแก้ไข
+            </p>
+            <p>
+              ผู้ใช้ต้องแจ้งเราเมื่อเกิดเหตุในระบบของตนที่อาจกระทบข้อมูลที่แชร์กับ FaceIN
+              และให้ความร่วมมือในการสอบสวน และบันทึกเหตุการณ์เพื่อส่งต่อให้หน่วยงานรัฐเมื่อร้องขอ
+            </p>
+          </Section>
+
+          <Section title="14. กฎหมายที่ใช้บังคับ">
+            <p>
+              เงื่อนไขนี้อยู่ภายใต้กฎหมายแห่งราชอาณาจักรไทย หากมีข้อพิพาท
+              คู่สัญญาตกลงใช้ศาลไทยเป็นผู้มีเขตอำนาจพิจารณา
+            </p>
+          </Section>
+
+          <Section title="15. การแก้ไขเงื่อนไข">
+            <p>
+              เราอาจปรับปรุงเงื่อนไขเพื่อให้สอดคล้องกับบริการหรือข้อกำหนดใหม่
+              หากมีการแก้ไขสาระสำคัญจะแจ้งให้ทราบล่วงหน้าอย่างเหมาะสม
+              และการใช้งานต่อไปถือว่าผู้ใช้ยอมรับแล้ว
+            </p>
+          </Section>
+
+          <Section title="16. ช่องทางติดต่อ">
+            <p>
+              คำถามหรือข้อร้องเรียนเกี่ยวกับข้อตกลงนี้ โปรดติดต่อ{" "}
+              <strong>support@example.com</strong> หรือเจ้าหน้าที่ดูแลสัญญาตามที่ระบุในเอกสารบริการ
+            </p>
+          </Section>
+
+          <div className="flex gap-2 items-center justify-center">
+            <SquarePen className="text-primary size-4" />
+            <p className="text-sm text-primary">ปรับปรุงล่าสุด: {lastUpdated}</p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
