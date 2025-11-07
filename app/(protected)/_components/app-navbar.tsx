@@ -1,7 +1,7 @@
 "use client"
 
 // Next.js
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 // Components
 import { Button } from "@/components/ui/button"
@@ -19,11 +19,12 @@ import { normalizePath } from "@/lib/utils/navigation"
 import { UserButton } from "@stackframe/stack"
 import { useTheme } from "next-themes"
 import { useCallback } from "react"
-import { CircleQuestionMark } from "lucide-react"
+import { CircleQuestionMark, House } from "lucide-react"
 
-export default function SiteHeader() {
+export default function AppNavbar() {
   // Get current pathname
   const pathname = usePathname()
+  const router = useRouter()
 
   // Theme
   const { theme, setTheme } = useTheme()
@@ -32,6 +33,11 @@ export default function SiteHeader() {
   const handleThemeToggle = useCallback(() => {
     setTheme(theme === "light" ? "dark" : "light")
   }, [theme, setTheme])
+
+  // Navigate to home
+  const handleToHome = () => {
+    router.push("/")
+  }
 
   // Determine current path name
   const currentPath =
@@ -46,7 +52,7 @@ export default function SiteHeader() {
       : null
 
   return (
-    <header className="flex items-center border-b px-4 sticky top-0 z-10 bg-background h-(--header-height)">
+    <nav className="flex items-center border-b px-4 sticky top-0 z-10 bg-background h-(--header-height)">
       <div className="flex w-full items-center gap-1 lg:gap-2">
         <SidebarTrigger />
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
@@ -64,10 +70,19 @@ export default function SiteHeader() {
             <CircleQuestionMark />
           </Button>
           <div className="p-2 mt-2">
-            <UserButton colorModeToggle={handleThemeToggle} />
+            <UserButton
+              colorModeToggle={handleThemeToggle}
+              extraItems={[
+                {
+                  text: "Go to home",
+                  icon: <House className="size-4" />,
+                  onClick: handleToHome,
+                },
+              ]}
+            />
           </div>
         </div>
       </div>
-    </header>
+    </nav>
   )
 }
