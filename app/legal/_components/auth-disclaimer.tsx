@@ -3,7 +3,7 @@ import Link from "next/link"
 
 export default function AuthDisclaimer() {
   return (
-    <div className="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-4">
+    <div className="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-4 leading-relaxed tracking-wide">
       การใช้งานบริการนี้ถือว่าคุณยอมรับ{" "}
       <Link
         className="hover:text-neutral-900 dark:hover:text-neutral-50 underline text-neutral-800 dark:text-neutral-200"
