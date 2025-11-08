@@ -5,16 +5,15 @@ import { useCallback } from "react"
 
 // Next.js
 import { useTheme } from "next-themes"
-
-// Components
-import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 // Icons
-import { CircleQuestionMark, LayoutDashboard } from "lucide-react"
+import { LayoutDashboard } from "lucide-react"
 
 // Stack Auth
 import { UserButton, useUser } from "@stackframe/stack"
 import { useRouter } from "next/navigation"
+import LegalDropdown from "@/app/legal/_components/legal-dropdown"
 
 export default function SiteNavbar() {
   // Theme
@@ -38,16 +37,16 @@ export default function SiteNavbar() {
   }
 
   return (
-    <nav className="w-full border-b px-4 sticky top-0 z-10 bg-background h-(--header-height)">
+    <nav className="w-full px-4 sticky top-0 z-10 bg-background/20 h-(--header-height) backdrop-blur-xl border-b">
       <div className="flex w-full items-center gap-1 lg:gap-2">
-        <div></div>
+        <Link href="/" rel="home" className="flex items-center">
+          <h1 className="text-lg font-black font-sans">FaceIN</h1>
+        </Link>
         <div className="ml-auto flex items-center gap-1 lg:gap-2 font-sans">
-          <Button variant="ghost" size="sm">
-            <CircleQuestionMark />
-          </Button>
+          <LegalDropdown />
           <div className="p-2 mt-1">
             <UserButton
-              colorModeToggle={handleThemeToggle}
+              // colorModeToggle={handleThemeToggle}
               extraItems={[
                 {
                   text: "Dashboard",

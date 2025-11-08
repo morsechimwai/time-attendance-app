@@ -1,4 +1,5 @@
-import SiteNavbar from "@/components/side-navbar"
+import SiteFooter from "@/components/site-footer"
+import SiteNavbar from "@/components/site-navbar"
 
 export default function LegalLayout({
   children,
@@ -9,6 +10,7 @@ export default function LegalLayout({
     <>
       <SiteNavbar />
       <section>{children}</section>
+      <SiteFooter />
     </>
   )
 }
