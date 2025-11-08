@@ -6,6 +6,7 @@ import { useCallback } from "react"
 // Next.js
 import { useTheme } from "next-themes"
 import Link from "next/link"
+import Image from "next/image"
 
 // Icons
 import { LayoutDashboard } from "lucide-react"
@@ -40,7 +41,14 @@ export default function SiteNavbar() {
     <nav className="w-full px-4 sticky top-0 z-10 bg-background/20 h-(--header-height) backdrop-blur-xl border-b">
       <div className="flex w-full items-center gap-1 lg:gap-2">
         <Link href="/" rel="home" className="flex items-center">
-          <h1 className="text-xl font-black font-sans">ClokIn</h1>
+          {/* <h1 className="text-xl font-black font-sans">ClokIn</h1> */}
+          <Image
+            src="/clokin-logo.png"
+            alt="ClokIn Logo"
+            width={150}
+            height={50}
+            className="aspect-auto hover:opacity-70 transition-opacity"
+          />
         </Link>
         <div className="ml-auto flex items-center gap-1 lg:gap-2 font-sans">
           <LegalDropdown />
