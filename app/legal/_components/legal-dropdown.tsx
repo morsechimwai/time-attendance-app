@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ArrowUpRight, CircleQuestionMark } from "lucide-react"
+import { ArrowUpRight, CircleQuestionMark, Scale } from "lucide-react"
 import Link from "next/link"
 
 export default function LegalDropdown() {
@@ -19,7 +19,7 @@ export default function LegalDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>Legals</DropdownMenuLabel>
+        <DropdownMenuLabel>Legal Center</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/legal/privacy" target="_blank" rel="noopener noreferrer">
