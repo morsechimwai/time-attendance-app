@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import AppProviders from "./_providers/app-providers"
-import SiteHeader from "@/components/site-navbar"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,12 +14,12 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://face.in"),
+  metadataBase: new URL("https://clokin.app"),
   title: {
-    default: "Time and Attendance Management",
-    template: "FaceIN | %s",
+    default: "ลงเวลาเข้างานด้วยใบหน้า",
+    template: "ClokIn | %s",
   },
-  description: "Manage your time and attendance efficiently with FaceIN.",
+  description: "Manage your time and attendance efficiently with ClokIn.",
 }
 
 export default function RootLayout({

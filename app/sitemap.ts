@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next"
 
-const baseUrl = "https://face.in"
+const baseUrl = "https://clokin.app"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next"
 
-const baseUrl = "https://face.in"
+const baseUrl = "https://clokin.app"
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/app/", "/api/", "/team/"],
+        disallow: ["/app/", "/api/", "/team/", "/handler/"],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

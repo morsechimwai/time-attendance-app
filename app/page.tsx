@@ -5,8 +5,8 @@ import SiteFooter from "@/components/site-footer"
 import { ScanFace } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "FaceIN · ลงเวลาแบบเข้าใจง่าย",
-  description: "ลงชื่อเข้างานด้วยใบหน้า ดูเวลาทำงาน และคิดเงินเดือนได้ในหน้าเดียว",
+  title: "ClokIn - ลงเวลาเข้างานด้วยใบหน้า",
+  description: "ลงเวลาเข้างานด้วยใบหน้า ดูเวลาทำงาน และคิดเงินเดือนได้ในหน้าเดียว",
 }
 
 const quickFacts = [
