@@ -17,8 +17,8 @@ import {
 // Utils
 import { normalizePath } from "@/lib/utils/navigation"
 import { UserButton } from "@stackframe/stack"
-import { useTheme } from "next-themes"
-import { useCallback } from "react"
+// import { useTheme } from "next-themes"
+// import { useCallback } from "react"
 import { House } from "lucide-react"
 import LegalDropdown from "@/app/legal/_components/legal-dropdown"
 
@@ -28,12 +28,12 @@ export default function AppNavbar() {
   const router = useRouter()
 
   // Theme
-  const { theme, setTheme } = useTheme()
+  // const { theme, setTheme } = useTheme()
 
   // Theme toggle
-  const handleThemeToggle = useCallback(() => {
-    setTheme(theme === "light" ? "dark" : "light")
-  }, [theme, setTheme])
+  // const handleThemeToggle = useCallback(() => {
+  //   setTheme(theme === "light" ? "dark" : "light")
+  // }, [theme, setTheme])
 
   // Navigate to home
   const handleToHome = () => {
@@ -66,7 +66,7 @@ export default function AppNavbar() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="ml-auto flex items-center gap-1 sm:gap-2 lg:gap-3 font-sans">
+        <div className="ml-auto flex items-center gap-1 sm:gap-2 lg:gap-6 font-sans">
           {/* Hide legal dropdown on small screens to save space */}
           <div className="hidden sm:block">
             <LegalDropdown />
