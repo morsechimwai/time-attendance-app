@@ -81,7 +81,7 @@ export default function HomePage() {
             {quickFacts.map((fact) => (
               <div
                 key={fact.label}
-                className="flex flex-col items-center sm:items-start text-center sm:text-left"
+                className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-2"
               >
                 <p className="text-xs uppercase tracking-[0.3em] text-neutral-400">{fact.label}</p>
                 <p className="text-lg font-semibold text-neutral-900">{fact.value}</p>
