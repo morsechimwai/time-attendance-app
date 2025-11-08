@@ -17,14 +17,21 @@ export default function NotFound() {
   return (
     <Empty className="h-screen">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <CloudAlert className="size-6 text-muted-foreground" />
+        <EmptyMedia variant="icon" className="bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+          <CloudAlert className="size-6 text-neutral-600 dark:text-neutral-300" />
         </EmptyMedia>
         <EmptyTitle>Page Not Found</EmptyTitle>
-        <EmptyDescription>The page you are looking for does not exist.</EmptyDescription>
+        <EmptyDescription className="text-neutral-600 dark:text-neutral-400">
+          The page you are looking for does not exist.
+        </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button variant="link" asChild className="text-muted-foreground" size="sm">
+        <Button
+          variant="link"
+          asChild
+          className="text-neutral-700 hover:text-neutral-900 dark:text-neutral-200 dark:hover:text-neutral-50"
+          size="sm"
+        >
           <Link href="/">
             Go Home <ArrowUpRightIcon />
           </Link>
