@@ -30,7 +30,7 @@ export default function SiteNavbar() {
   }
 
   return (
-    <nav className="flex items-center px-4 sm:px-6 lg:px-8 sticky top-0 z-50 h-(--header-height) bg-white/80 backdrop-blur-xl">
+    <nav className="flex items-center px-4 sm:px-6 lg:px-8 sticky top-0 z-50 h-(--header-height) bg-white/50 backdrop-blur-2xl">
       <div className="flex w-full items-center gap-1 lg:gap-2 py-3 sm:py-4">
         <Link href="/" rel="home" className="flex items-center shrink-0">
           <Image
@@ -46,17 +46,15 @@ export default function SiteNavbar() {
           <div className="hidden sm:block">
             <LegalDropdown />
           </div>
-          <div className="mt-2">
-            <UserButton
-              extraItems={[
-                {
-                  text: "Dashboard",
-                  icon: <LayoutDashboard className="size-4" />,
-                  onClick: handleToDashboard,
-                },
-              ]}
-            />
-          </div>
+          <UserButton
+            extraItems={[
+              {
+                text: "Dashboard",
+                icon: <LayoutDashboard className="size-4" />,
+                onClick: handleToDashboard,
+              },
+            ]}
+          />
         </div>
       </div>
     </nav>

@@ -126,7 +126,7 @@ export default function AppSidebar({ teamId }: AppSidebarProps = {}) {
           <div className="px-2">
             <SelectedTeamSwitcher
               selectedTeam={currentTeam ?? undefined}
-              triggerClassName="border-0 ring-0 bg-transparent hover:bg-transparent focus:bg-transparent"
+              triggerClassName="border-0 ring-0 shadow-none bg-transparent hover:bg-transparent focus:bg-transparent"
             />
           </div>
         </SidebarHeader>

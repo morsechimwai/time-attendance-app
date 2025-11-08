@@ -53,7 +53,7 @@ export default function AppNavbar() {
       : null
 
   return (
-    <nav className="flex items-center px-4 sm:px-6 lg:px-8 sticky top-0 z-50 h-(--header-height) bg-white/80 backdrop-blur-xl border-b border-neutral-200/60">
+    <nav className="flex items-center px-4 sm:px-6 lg:px-8 sticky top-0 z-50 h-(--header-height) bg-white/50 backdrop-blur-2xl border-b border-neutral-200/60">
       <div className="flex w-full items-center gap-1 lg:gap-2 py-3 sm:py-4">
         <SidebarTrigger />
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
@@ -71,18 +71,16 @@ export default function AppNavbar() {
           <div className="hidden sm:block">
             <LegalDropdown />
           </div>
-          <div className="mt-2">
-            <UserButton
-              // colorModeToggle={handleThemeToggle}
-              extraItems={[
-                {
-                  text: "Go to home",
-                  icon: <House className="size-4" />,
-                  onClick: handleToHome,
-                },
-              ]}
-            />
-          </div>
+          <UserButton
+            // colorModeToggle={handleThemeToggle}
+            extraItems={[
+              {
+                text: "Go to home",
+                icon: <House className="size-4" />,
+                onClick: handleToHome,
+              },
+            ]}
+          />
         </div>
       </div>
     </nav>
