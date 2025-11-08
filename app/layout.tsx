@@ -49,6 +49,7 @@ export default function RootLayout({
           <MainBackground
             backgroundVariant="minimal"
             backdropIntensity="medium"
+            backdropBlur="none"
             backdropTint="white"
             className="w-full bg-linear-to-b from-white to-neutral-50 text-neutral-900"
           >

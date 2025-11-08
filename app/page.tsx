@@ -1,15 +1,21 @@
+// NextJS
 import type { Metadata } from "next"
 import Link from "next/link"
+
+// Components
 import SiteNavbar from "@/components/site-navbar"
 import SiteFooter from "@/components/site-footer"
-import MainBackground from "@/components/main-background"
+
+// Icons
 import { ScanFace, Zap, Smartphone, Calculator } from "lucide-react"
 
+// Metadata
 export const metadata: Metadata = {
   title: "ClokIn - ลงเวลาเข้างานด้วยใบหน้า",
   description: "ลงเวลาเข้างานด้วยใบหน้า ดูเวลาทำงาน และคิดเงินเดือนได้ในหน้าเดียว",
 }
 
+// Quick Facts Data
 const quickFacts = [
   {
     icon: Zap,
@@ -60,6 +66,7 @@ export default function HomePage() {
     <>
       <SiteNavbar />
 
+      {/* Main content */}
       <main className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <section className="w-full max-w-6xl text-center space-y-8 sm:space-y-12 lg:space-y-16 py-8 sm:py-16 lg:py-24">
           <div className="space-y-6 sm:space-y-8">
