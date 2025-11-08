@@ -4,7 +4,7 @@
 import { usePathname, useRouter } from "next/navigation"
 
 // Components
-import { Button } from "@/components/ui/button"
+
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
@@ -19,7 +19,7 @@ import { normalizePath } from "@/lib/utils/navigation"
 import { UserButton } from "@stackframe/stack"
 import { useTheme } from "next-themes"
 import { useCallback } from "react"
-import { CircleQuestionMark, House } from "lucide-react"
+import { House } from "lucide-react"
 import LegalDropdown from "@/app/legal/_components/legal-dropdown"
 
 export default function AppNavbar() {
@@ -53,8 +53,8 @@ export default function AppNavbar() {
       : null
 
   return (
-    <nav className="flex items-center px-4 sticky top-0 z-10 bg-background h-(--header-height) backdrop-blur-xl border-b">
-      <div className="flex w-full items-center gap-1 lg:gap-2">
+    <nav className="flex items-center px-4 sm:px-6 lg:px-8 sticky top-0 z-50 h-(--header-height) bg-white/80 backdrop-blur-xl border-b border-neutral-200/60">
+      <div className="flex w-full items-center gap-1 lg:gap-2 py-3 sm:py-4">
         <SidebarTrigger />
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
         <Breadcrumb>
@@ -66,9 +66,12 @@ export default function AppNavbar() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="ml-auto flex items-center gap-1 lg:gap-2 font-sans">
-          <LegalDropdown />
-          <div className="p-2 mt-2">
+        <div className="ml-auto flex items-center gap-1 sm:gap-2 lg:gap-3 font-sans">
+          {/* Hide legal dropdown on small screens to save space */}
+          <div className="hidden sm:block">
+            <LegalDropdown />
+          </div>
+          <div className="mt-2">
             <UserButton
               // colorModeToggle={handleThemeToggle}
               extraItems={[

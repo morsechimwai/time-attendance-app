@@ -25,7 +25,7 @@ export default async function ProtectedLayout({
   const teamId = Array.isArray(paramTeamId) ? paramTeamId[0] : paramTeamId
 
   return (
-    <div className="flex min-h-svh w-full bg-muted/40">
+    <div className="flex min-h-svh w-full">
       <AppSidebar teamId={teamId} />
       <div className="flex flex-1 flex-col">
         <AppNavbar />
