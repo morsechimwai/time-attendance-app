@@ -1,6 +1,7 @@
 // NextJS
 import { Metadata } from "next"
 import Image from "next/image"
+import Link from "next/link"
 
 // React
 import type { ReactNode } from "react"
@@ -44,13 +45,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent"></div>
 
           <div className="relative z-10 flex flex-col justify-between p-8 xl:p-12 2xl:p-16 text-neutral-900">
-            <div className="flex flex-col space-y-8">
-              <span className="inline-flex w-fit items-center rounded-full bg-neutral-900/10 backdrop-blur-sm border border-neutral-300/30 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-neutral-700 shadow-lg">
-                Clock in with face
-              </span>
-
-              <div className="space-y-6">
-                <div className="w-fit">
+            <div className="flex flex-col space-y-10">
+              <div className="flex flex-col gap-6 xl:gap-8 items-start">
+                <Link href="/" className="w-fit">
                   <Image
                     src="/clokin-logo.png"
                     alt="ClokIn Logo"
@@ -58,7 +55,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                     height={67}
                     className="w-48 xl:w-56 2xl:w-64 h-auto aspect-auto hover:opacity-80 transition-opacity"
                   />
-                </div>
+                </Link>
                 <p className="max-w-lg text-lg xl:text-xl leading-relaxed font-sans font-medium text-neutral-600">
                   แพลตฟอร์มที่ช่วยให้ทีมของคุณลงเวลา คำนวณเงินเดือน
                   และตรวจสอบความถูกต้องได้ในไม่กี่นาที
@@ -79,8 +76,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         {/* Right Section - Full width on mobile, half on lg+ */}
         <section className="flex flex-1 lg:w-1/2 xl:w-2/5 items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 xl:p-12">
           <div className="w-full max-w-sm lg:max-w-md xl:max-w-lg flex items-center justify-center">
-            <div className="w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl shadow-black/20 border border-white/30 p-6 sm:p-8 lg:p-10 relative z-20 flex items-center justify-center min-h-[400px]">
-              <div className="w-full flex flex-col items-center justify-center space-y-6 text-center">
+            <div className="w-full bg-white/95 backdrop-blur-md rounded-4xl shadow-2xl shadow-black/20 border border-white/30 p-6 sm:p-8 lg:p-10 relative z-20 flex items-center justify-center min-h-[600px]">
+              <div className="w-full flex flex-col items-center justify-center space-y-6">
                 {children}
               </div>
             </div>
