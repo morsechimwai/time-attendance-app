@@ -57,12 +57,7 @@ function SecondaryLink({ href, children }: { href: string; children: React.React
 
 export default function HomePage() {
   return (
-    <MainBackground
-      backgroundVariant="intense"
-      backdropIntensity="medium"
-      backdropTint="white"
-      className="bg-linear-to-b from-white to-neutral-50 text-neutral-900"
-    >
+    <>
       <SiteNavbar />
 
       <main className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -118,6 +113,6 @@ export default function HomePage() {
       </main>
 
       <SiteFooter />
-    </MainBackground>
+    </>
   )
 }

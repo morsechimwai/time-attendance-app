@@ -16,7 +16,7 @@ export default function Copyright({ className }: CopyrightProps) {
         href="https://github.com/morsechimwai"
         target="_blank"
         rel="noopener noreferrer"
-        className="underline underline-offset-4 hover:text-neutral-50"
+        className="underline underline-offset-4 hover:text-neutral-900 dark:hover:text-neutral-50 font-semibold"
       >
         morsechimwai
       </Link>

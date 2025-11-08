@@ -38,12 +38,12 @@ export default function SiteNavbar() {
   }
 
   return (
-    <nav className="w-full px-4 sm:px-6 lg:px-8 sticky top-0 z-10 bg-background/20 backdrop-blur-xl border-b">
+    <nav className="w-full px-4 sm:px-6 lg:px-8 sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-neutral-200/60">
       <div className="max-w-7xl mx-auto">
         <div className="flex w-full items-center justify-between py-3 sm:py-4 gap-2 sm:gap-4">
           <Link href="/" rel="home" className="flex items-center shrink-0">
             <Image
-              src="/clokin-logo.png"
+              src="/clokin-app.png"
               alt="ClokIn Logo"
               width={150}
               height={50}
@@ -56,7 +56,7 @@ export default function SiteNavbar() {
             <div className="hidden sm:block">
               <LegalDropdown />
             </div>
-            <div className="p-1.5 sm:p-2">
+            <div className="mt-2">
               <UserButton
                 // colorModeToggle={handleThemeToggle}
                 extraItems={[
