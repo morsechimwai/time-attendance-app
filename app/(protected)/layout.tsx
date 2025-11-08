@@ -6,12 +6,12 @@ import AppSidebar from "@/app/(protected)/_components/app-sidebar"
 import AppNavbar from "@/app/(protected)/_components/app-navbar"
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://face.in"),
+  metadataBase: new URL("https://clokin.app"),
   title: {
     default: "Dashboard",
-    template: "%s | FaceIN",
+    template: "%s | ClokIn",
   },
-  description: "Dashboard for managing time and attendance efficiently with FaceIN.",
+  description: "Dashboard for managing time and attendance efficiently with ClokIn.",
 }
 
 export default async function ProtectedLayout({

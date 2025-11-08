@@ -8,10 +8,10 @@ import type { ReactNode } from "react"
 import Copyright from "@/components/copyright"
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://face.in"),
+  metadataBase: new URL("https://clokin.app"),
   title: {
     default: "เข้าสู่ระบบ",
-    template: "%s | FaceIN",
+    template: "%s | ClokIn",
   },
   description:
     "ระบบลงเวลาและเงินเดือนที่ใช้งานง่าย พร้อมอัตโนมัติที่ช่วยให้ทีมทำงานไหลลื่นขึ้นทันที",
@@ -35,11 +35,11 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             {/* Animation Background */}
             <div className="absolute inset-0 flex flex-col justify-center px-18 py-12">
               <div className="flex flex-col gap-6 text-neutral-50">
-                <span className="inline-flex w-fit items-center rounded-full bg-neutral-100/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-neutral-50/80">
-                  ทำงานแทนคุณในเรื่องซ้ำ ๆ
+                <span className="inline-flex w-fit items-center rounded-full bg-neutral-100/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-neutral-50/80">
+                  Clock in with face
                 </span>
                 <div className="flex gap-4 items-center">
-                  <h2 className="mt-8 text-6xl font-black font-sans">FaceIN</h2>
+                  <h2 className="mt-8 text-6xl font-black font-sans">ClokIn</h2>
                 </div>
                 <p className="max-w-sm text-base leading-relaxed font-sans font-medium">
                   แพลตฟอร์มที่ช่วยให้ทีมของคุณลงเวลา คำนวณเงินเดือน
@@ -51,7 +51,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                   <Feature text="ระบบเงินเดือนที่ตั้งกฎได้ละเอียด และคำนวณให้อัตโนมัติทุกงวด" />
                 </div>
               </div>
-              <Copyright textColor="text-neutral-200" />
+              <Copyright className="text-neutral-200" />
             </div>
           </div>
         </div>

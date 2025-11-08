@@ -18,7 +18,7 @@ const Section = ({ title, children }: { title: string; children: ReactNode }) =>
 export default function TermsPage() {
   const lastUpdated = formatThaiDate()
   const legalMeta = [
-    { label: "ขอบเขตบริการ", value: "FaceIN SaaS / API สำหรับยืนยันตัวตนและบันทึกเวลา" },
+    { label: "ขอบเขตบริการ", value: "ClokIn SaaS / API สำหรับยืนยันตัวตนและบันทึกเวลา" },
     { label: "กฎหมายอ้างอิง", value: "PDPA, ป.พ.พ., พ.ร.บ.คอมพิวเตอร์, กฎหมายแรงงาน" },
     { label: "ประเภทข้อมูล", value: "ข้อมูลชีวภาพใบหน้า ภาพถ่าย บันทึกใช้งาน" },
     { label: "อัปเดต", value: lastUpdated },
@@ -34,7 +34,7 @@ export default function TermsPage() {
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6">
         <div className="rounded-3xl border border-neutral-200 p-8 backdrop-blur">
           <div className="flex flex-wrap items-center gap-4">
-            <h2 className="text-5xl font-black tracking-tight text-neutral-900">FaceIN</h2>
+            <h2 className="text-5xl font-black tracking-tight text-neutral-900">ClokIn</h2>
             <span className="rounded-full bg-neutral-900 px-4 py-1 text-sm font-semibold uppercase tracking-[0.2em] text-neutral-100">
               Terms
             </span>
@@ -43,7 +43,7 @@ export default function TermsPage() {
             ข้อตกลงการใช้บริการ (Terms of Service)
           </h1>
           <p className="mt-4 text-base leading-relaxed tracking-[0.01em] text-neutral-600">
-            การเข้าถึงหรือใช้ FaceIN (“บริการ”)
+            การเข้าถึงหรือใช้ ClokIn (“บริการ”)
             ถือว่าผู้ใช้ยอมรับเงื่อนไขที่ออกแบบเพื่อคุ้มครองข้อมูลส่วนบุคคล
             โดยเฉพาะข้อมูลชีวภาพและข้อมูลภาพที่เกี่ยวข้องกับ AI ตามกฎหมายไทย หากไม่ยอมรับ
             โปรดยุติการใช้งานทันที
@@ -73,7 +73,7 @@ export default function TermsPage() {
         <div className="space-y-6">
           <Section title="1. คู่สัญญาและขอบเขต">
             <p>
-              ข้อตกลงนี้ควบคุมความสัมพันธ์ระหว่างผู้ให้บริการ FaceIN กับลูกค้า/ผู้ใช้
+              ข้อตกลงนี้ควบคุมความสัมพันธ์ระหว่างผู้ให้บริการ ClokIn กับลูกค้า/ผู้ใช้
               ทั้งในรูปแบบเว็บแอป แอปโมบาย และ API ที่เชื่อมต่อระบบยืนยันตัวตนด้วย AI
               ผู้ลงนามต้องมีอำนาจตามกฎหมาย และรับผิดชอบสมาชิกทุกคนภายใต้บัญชีเดียวกัน
             </p>
@@ -144,13 +144,13 @@ export default function TermsPage() {
 
           <Section title="6. การใช้ AI และการประมวลผลข้อมูลภาพ">
             <p>
-              FaceIN ใช้โมเดลการเรียนรู้เชิงลึกสำหรับพิสูจน์ตัวตนและตรวจจับความผิดปกติ
+              ClokIn ใช้โมเดลการเรียนรู้เชิงลึกสำหรับพิสูจน์ตัวตนและตรวจจับความผิดปกติ
               โดยยึดแนวทางของสำนักงานพัฒนาธุรกรรมทางอิเล็กทรอนิกส์ (ETDA) และหลักการ AI Ethics
             </p>
             <ul className="list-disc space-y-2 pl-6">
               <li>ไม่ใช้ข้อมูลภาพที่ระบุตัวบุคคลได้เพื่อฝึกโมเดลอื่นโดยไม่ได้รับความยินยอม</li>
               <li>
-                ผู้ใช้รับรองว่ามีสิทธิ์ในการอัปโหลดหรือแชร์ภาพกับ FaceIN
+                ผู้ใช้รับรองว่ามีสิทธิ์ในการอัปโหลดหรือแชร์ภาพกับ ClokIn
                 และจะไม่ใช้เพื่อละเมิดสิทธิของบุคคลที่สาม
               </li>
               <li>ผลลัพธ์ AI เป็นข้อมูลประกอบ ผู้ใช้ยังคงรับผิดชอบการตัดสินใจขั้นสุดท้าย</li>
@@ -186,7 +186,7 @@ export default function TermsPage() {
 
           <Section title="10. ทรัพย์สินทางปัญญา">
             <p>
-              ซอฟต์แวร์ โมเดล AI เครื่องหมายการค้า และเอกสารประกอบบริการเป็นทรัพย์สินของ FaceIN
+              ซอฟต์แวร์ โมเดล AI เครื่องหมายการค้า และเอกสารประกอบบริการเป็นทรัพย์สินของ ClokIn
               หรือผู้อนุญาต ผู้ใช้ได้รับสิทธิ์ใช้งานแบบไม่ผูกขาดและเพิกถอนได้ ห้ามทำซ้ำ ดัดแปลง
               หรือเผยแพร่เกินสิทธิ์ที่ได้รับ
             </p>
@@ -220,7 +220,7 @@ export default function TermsPage() {
               ภายใน 72 ชั่วโมงหรือเร็วที่สุดตามที่กฎหมายกำหนด พร้อมระบุมาตรการแก้ไข
             </p>
             <p>
-              ผู้ใช้ต้องแจ้งเราเมื่อเกิดเหตุในระบบของตนที่อาจกระทบข้อมูลที่แชร์กับ FaceIN
+              ผู้ใช้ต้องแจ้งเราเมื่อเกิดเหตุในระบบของตนที่อาจกระทบข้อมูลที่แชร์กับ ClokIn
               และให้ความร่วมมือในการสอบสวน
             </p>
           </Section>

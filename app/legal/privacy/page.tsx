@@ -34,7 +34,7 @@ export default function PrivacyPage() {
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6">
         <div className="rounded-3xl border border-neutral-200 p-8 backdrop-blur">
           <div className="flex flex-wrap items-center gap-4">
-            <h2 className="text-5xl font-black tracking-tight text-neutral-900">FaceIN</h2>
+            <h2 className="text-5xl font-black tracking-tight text-neutral-900">ClokIn</h2>
             <span className="rounded-full bg-neutral-900 px-4 py-1 text-sm font-semibold uppercase tracking-[0.2em] text-neutral-100">
               Privacy
             </span>
@@ -43,7 +43,7 @@ export default function PrivacyPage() {
             นโยบายความเป็นส่วนตัว (Privacy Policy)
           </h1>
           <p className="mt-4 text-base leading-relaxed tracking-[0.01em] text-neutral-600">
-            เอกสารนี้อธิบายวิธีที่ FaceIN (“บริการ”) เก็บ ใช้ เปิดเผย และปกป้องข้อมูลส่วนบุคคล
+            เอกสารนี้อธิบายวิธีที่ ClokIn (“บริการ”) เก็บ ใช้ เปิดเผย และปกป้องข้อมูลส่วนบุคคล
             รวมถึงข้อมูลภาพและข้อมูลชีวภาพ โดยยึด PDPA และกฎหมายไทยที่เกี่ยวข้อง
             เราทำหน้าที่เป็นผู้ควบคุมข้อมูล และอาจแต่งตั้งผู้ประมวลผลย่อยภายใต้สัญญา
           </p>
@@ -178,7 +178,7 @@ export default function PrivacyPage() {
 
           <Section title="8. การตัดสินใจอัตโนมัติและ AI">
             <p>
-              FaceIN ใช้โมเดล AI เพื่อประเมินความตรงกันของใบหน้า แต่จะไม่ปล่อยให้ผลลัพธ์ AI
+              ClokIn ใช้โมเดล AI เพื่อประเมินความตรงกันของใบหน้า แต่จะไม่ปล่อยให้ผลลัพธ์ AI
               เพียงอย่างเดียวตัดสินใจเรื่องสำคัญ โดยไม่มีมนุษย์กำกับ ผู้ใช้สามารถร้องขอการทบทวนได้
             </p>
             <ul className="list-disc space-y-2 pl-6">
