@@ -79,9 +79,21 @@ function isProtected(pathname: string): boolean {
 export async function proxy(request: NextRequest) {
   const { nextUrl, method } = request
   const pathname = nextUrl.pathname
+  const isAuthPath = pathname === "/signin" || pathname === "/signup"
 
   // Skip preflight requests
   if (method === "OPTIONS") {
+    return NextResponse.next()
+  }
+
+  // If an authenticated user hits the signin/signup pages, send them to their dashboard.
+  if (isAuthPath) {
+    const user = await resolveUser(request)
+    if (user) {
+      const redirectPath = user.selectedTeam?.id ? `/team/${user.selectedTeam.id}/dashboard` : "/dashboard"
+      const redirectUrl = new URL(redirectPath, request.url)
+      return NextResponse.redirect(redirectUrl)
+    }
     return NextResponse.next()
   }
 
