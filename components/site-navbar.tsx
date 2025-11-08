@@ -40,7 +40,7 @@ export default function SiteNavbar() {
     <nav className="w-full px-4 sticky top-0 z-10 bg-background/20 h-(--header-height) backdrop-blur-xl border-b">
       <div className="flex w-full items-center gap-1 lg:gap-2">
         <Link href="/" rel="home" className="flex items-center">
-          <h1 className="text-lg font-black font-sans">FaceIN</h1>
+          <h1 className="text-xl font-black font-sans">ClokIn</h1>
         </Link>
         <div className="ml-auto flex items-center gap-1 lg:gap-2 font-sans">
           <LegalDropdown />
