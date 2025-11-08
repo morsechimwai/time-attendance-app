@@ -1,3 +1,4 @@
+import MainBackground from "@/components/main-background"
 import SiteFooter from "@/components/site-footer"
 import SiteNavbar from "@/components/site-navbar"
 

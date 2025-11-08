@@ -1,3 +1,4 @@
+import MainBackground from "@/components/main-background"
 import { SquarePen } from "lucide-react"
 import type { ReactNode } from "react"
 
@@ -7,7 +8,7 @@ const formatThaiDate = () =>
   )
 
 const Section = ({ title, children }: { title: string; children: ReactNode }) => (
-  <section className="rounded-2xl border border-neutral-200 p-6 backdrop-blur">
+  <section className="rounded-2xl border border-neutral-200 p-6 backdrop-blur bg-linear-to-br from-white via-white to-neutral-50/80">
     <h2 className="text-xl font-semibold text-neutral-900">{title}</h2>
     <div className="mt-3 space-y-3 text-neutral-700 leading-relaxed tracking-[0.01em]">
       {children}
@@ -32,9 +33,9 @@ export default function TermsPage() {
   return (
     <div className="py-12 sm:py-16">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6">
-        <div className="rounded-3xl border border-neutral-200 p-8 backdrop-blur">
+        <div className="rounded-3xl border border-neutral-200 p-8 backdrop-blur bg-linear-to-br from-white via-white to-neutral-50/80">
           <div className="flex flex-wrap items-center gap-4">
-            <h2 className="text-5xl font-black tracking-tight text-neutral-900">ClokIn</h2>
+            <h2 className="text-5xl font-black tracking-wider text-neutral-900">ClokIn</h2>
             <span className="rounded-full bg-neutral-900 px-4 py-1 text-sm font-semibold uppercase tracking-[0.2em] text-neutral-100">
               Terms
             </span>
@@ -50,7 +51,10 @@ export default function TermsPage() {
           </p>
           <dl className="mt-6 grid gap-4 text-sm text-neutral-600 sm:grid-cols-2">
             {legalMeta.map((meta) => (
-              <div key={meta.label} className="rounded-2xl border border-neutral-200 p-4">
+              <div
+                key={meta.label}
+                className="rounded-2xl border border-neutral-200 p-4 bg-linear-to-br from-white via-white to-neutral-50/80"
+              >
                 <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
                   {meta.label}
                 </dt>
