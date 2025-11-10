@@ -21,6 +21,7 @@ import { UserButton } from "@stackframe/stack"
 // import { useCallback } from "react"
 import { House } from "lucide-react"
 import LegalDropdown from "@/app/legal/_components/legal-dropdown"
+import RealTimeClock from "@/app/(protected)/_components/real-time-clock"
 
 export default function AppNavbar() {
   // Get current pathname
@@ -67,6 +68,7 @@ export default function AppNavbar() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="ml-auto flex items-center gap-1 sm:gap-2 lg:gap-6 font-sans">
+          <RealTimeClock className="hidden md:flex" showDate={false} format="24h" />
           {/* Hide legal dropdown on small screens to save space */}
           <div className="hidden sm:block">
             <LegalDropdown />

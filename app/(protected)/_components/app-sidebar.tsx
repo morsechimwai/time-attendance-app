@@ -8,14 +8,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 // Icons
-import {
-  Banknote,
-  Clock,
-  LayoutDashboard,
-  LucideIcon,
-  MessageCircleMore,
-  Users,
-} from "lucide-react"
+import { Banknote, Clock, LayoutDashboard, LucideIcon, Settings, Tablet, Users } from "lucide-react"
 
 // Components
 import {
@@ -31,11 +24,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import FeedbackDropdown from "@/app/(protected)/_components/feedback-dropdown"
 
 // Utils
 import { isActive, withTeamPath } from "@/lib/utils/navigation"
 import { SelectedTeamSwitcher, useUser } from "@stackframe/stack"
-import { Button } from "@/components/ui/button"
 
 interface NavigationItem {
   label: string
@@ -55,32 +48,47 @@ interface AppSidebarProps {
 // Navigation items
 const navigationGroups: NavigationGroup[] = [
   {
-    label: "Overview",
+    label: "ภาพรวม",
     items: [
       {
-        label: "Dashboard",
+        label: "หน้าหลัก",
         href: "/dashboard",
         icon: LayoutDashboard,
       },
       {
-        label: "Time Records", // หรือ "Attendance"
+        label: "บันทึกเวลา",
         href: "/attendance",
-        icon: Clock, // History -> Clock ดูธรรมชาติกว่า
+        icon: Clock,
       },
       {
-        label: "Payroll",
+        label: "เงินเดือน",
         href: "/payroll",
-        icon: Banknote, // เงินเด่นๆ
+        icon: Banknote,
       },
     ],
   },
   {
-    label: "People",
+    label: "บุคลากร",
     items: [
       {
-        label: "Employees",
+        label: "พนักงาน",
         href: "/employees",
-        icon: Users, // Users2 ok แต่ Users แทน HR app มากกว่า
+        icon: Users,
+      },
+    ],
+  },
+  {
+    label: "ระบบ",
+    items: [
+      {
+        label: "ตั้งค่า",
+        href: "/settings",
+        icon: Settings,
+      },
+      {
+        label: "เครื่องสแกน",
+        href: "/kiosk",
+        icon: Tablet,
       },
     ],
   },
@@ -106,11 +114,6 @@ export default function AppSidebar({ teamId }: AppSidebarProps = {}) {
       setOpenMobile(false)
     }
   }, [isMobile, setOpenMobile])
-
-  // Feedback handler
-  const handleFeedback = () => {
-    console.log("Feedback button clicked")
-  }
 
   // Close sidebar on navigation (mobile)
   useEffect(() => {
@@ -169,10 +172,7 @@ export default function AppSidebar({ teamId }: AppSidebarProps = {}) {
 
         <SidebarFooter className="mt-auto border-t">
           <div className="p-2">
-            <Button className="w-full" variant="outline" onClick={handleFeedback}>
-              <MessageCircleMore />
-              <span>Feedback</span>
-            </Button>
+            <FeedbackDropdown className="w-full" />
           </div>
         </SidebarFooter>
       </Sidebar>
