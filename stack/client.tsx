@@ -7,5 +7,7 @@ export const stackClientApp = new StackClientApp({
     signUp: "/signup",
     afterSignIn: "/",
     afterSignOut: "/",
+    forgotPassword: "/forgot-password",
+    passwordReset: "/reset-password",
   },
 })
