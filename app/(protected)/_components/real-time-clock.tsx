@@ -47,7 +47,7 @@ export default function RealTimeClock({
 
   return (
     <div
-      className={`flex items-center gap-2 text-sm font-mono px-3 py-2 border border-border rounded-lg bg-background/50 backdrop-blur-sm ${className}`}
+      className={`flex items-center gap-2 text-sm font-mono px-3 py-2 rounded-lg bg-background/50 backdrop-blur-sm ${className}`}
     >
       <Clock className="h-4 w-4 text-muted-foreground" />
       <div className="flex flex-col items-end">

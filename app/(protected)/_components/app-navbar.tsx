@@ -54,35 +54,40 @@ export default function AppNavbar() {
       : null
 
   return (
-    <nav className="flex items-center px-4 sm:px-6 lg:px-8 sticky top-0 z-50 h-(--header-height) bg-white/50 backdrop-blur-2xl border-b border-neutral-200/60">
-      <div className="flex w-full items-center gap-1 lg:gap-2 py-3 sm:py-4">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
+    <nav className="flex items-center sticky top-0 z-50 bg-white/50 backdrop-blur-2xl border-b border-neutral-200">
+      <div className="flex w-full items-center gap-4">
+        <div className="p-2.5">
+          <SidebarTrigger />
+        </div>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbPage className="font-medium capitalize font-sans">
+              <BreadcrumbPage className="font-semibold capitalize font-sans">
                 {currentPath}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="ml-auto flex items-center gap-1 sm:gap-2 lg:gap-6 font-sans">
-          <RealTimeClock className="hidden md:flex" showDate={false} format="24h" />
+        <div className="ml-auto flex items-center gap-1 sm:gap-2 lg:gap-4 font-sans">
+          <div className="p-2">
+            <RealTimeClock className="hidden md:flex" showDate={false} format="24h" />
+          </div>
           {/* Hide legal dropdown on small screens to save space */}
-          <div className="hidden sm:block">
+          <div className="hidden sm:block p-2">
             <LegalDropdown />
           </div>
-          <UserButton
-            // colorModeToggle={handleThemeToggle}
-            extraItems={[
-              {
-                text: "Go to home",
-                icon: <House className="size-4" />,
-                onClick: handleToHome,
-              },
-            ]}
-          />
+          <div className="p-2">
+            <UserButton
+              // colorModeToggle={handleThemeToggle}
+              extraItems={[
+                {
+                  text: "Go to home",
+                  icon: <House className="size-4" />,
+                  onClick: handleToHome,
+                },
+              ]}
+            />
+          </div>
         </div>
       </div>
     </nav>
